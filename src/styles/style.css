@@ -20,15 +20,9 @@ textarea {
   margin: 12px 0;
   font-family: 'Inter', sans-serif;
   background-color: transparent;
-  color: white;
+  /* color: white; */
   border: 1px solid #aaa;
   border-radius: 4px;
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: #aaa;
-  font-weight: bold;
 }
 
 .note-app__header {
@@ -64,50 +58,11 @@ textarea::placeholder {
   margin: 16px 0;
 }
 
-.note-input {
-  margin: 0 auto;
-  max-width: 500px;
-  margin-bottom: 48px;
-}
-
-.note-input input,
-.note-input textarea {
-  display: block;
-  width: 100%;
-}
-
-.note-input__title {
-  font-weight: bold;
-}
-
-.note-input__title__char-limit {
-  font-size: 14px;
-  text-align: right;
-  color: #aaa;
-}
-
-.note-input__body {
-  min-height: 175px;
-}
-
-.note-input button {
-  display: block;
-  width: 100%;
-  padding: 8px;
-  background-color: transparent;
-  font-family: 'Inter', sans-serif;
-  color: white;
-  border: 1px solid #aaa;
-  border-radius: 4px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
 .note-app__body__actions {
   gap: 4px;
   display: flex;
   margin-bottom: 1em;
-  justify-items: space;
+  align-items: center;
   justify-content: space-between;
 }
 
@@ -135,13 +90,16 @@ textarea::placeholder {
   display: flex;
 }
 
-.notes-app__button__idle {
+.notes-app__button {
   cursor: pointer;
   padding: 10px 64px;
+  background: none;
   border-radius: 6px;
   height: max-content;
   border-style: solid;
+}
 
+.notes-app__button__idle {
   color: #555;
   background: #BBB;
 }
@@ -151,13 +109,6 @@ textarea::placeholder {
 }
 
 .notes-app__button__selected {
-  cursor: pointer;
-  padding: 10px 64px;
-  background: none;
-  border-radius: 6px;
-  height: max-content;
-  border-style: solid;
-
   color: white;
   background: #24B655;
 }
@@ -173,7 +124,18 @@ textarea::placeholder {
   gap: 16px;
   margin-bottom: 48px;
 
-  min-height: 580px;
+  min-height: 500px;
+}
+
+.notes-list__loading-wrapper {
+  gap: 8px;
+  display: flex;
+  margin-bottom: 48px;
+  justify-content: center;
+  
+  min-height: 500px;
+  
+  color: #666;
 }
 
 .notes-list__empty-message {
@@ -183,13 +145,12 @@ textarea::placeholder {
   color: #aaa;
   margin-bottom: 48px;
 
-  min-height: 580px;
+  min-height: 500px;
 }
 
 .notes-list__empty-message img {
   margin: auto 0;
   height: 38px;
-  
 }
 
 .notes-list__empty-message p {
@@ -210,6 +171,7 @@ textarea::placeholder {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  cursor: pointer;
 }
 
 .note-item__content {
@@ -277,10 +239,6 @@ textarea::placeholder {
 @media only screen and (min-width: 800px) {
   .notes-list {
     grid-template-columns: repeat(3, 1fr);
-  }
-
-  .note-search input {
-    min-width: 400px;
   }
 }
 

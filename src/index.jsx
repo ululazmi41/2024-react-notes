@@ -1,9 +1,13 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 
-// import style
-import './styles/style.css';
+// Styles
 import './styles/dots.css';
+import './styles/style.css';
+import './styles/noteInput.css';
+import './styles/tailwind.css';
+
+// Components
 import App from './App';
 
 const element = document.getElementById('root');

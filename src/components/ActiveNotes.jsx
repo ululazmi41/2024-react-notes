@@ -2,10 +2,10 @@ import React from 'react';
 import { showFormattedDate } from '../utils';
 import NoteItem from './NoteItem';
 
-function ActiveNotes({ notes, isLoading, onDelete, onToggleArchive }) {
+function ActiveNotes({ notes, isLoading, navigateTo, onDelete, onToggleArchive }) {
   if (isLoading) {
     return (
-      <div className="notes-list__empty-message">
+      <div className="notes-list__loading-wrapper">
         <div className="dots-bars-6 notes-list__loading"></div>
       </div>
     );
@@ -22,6 +22,7 @@ function ActiveNotes({ notes, isLoading, onDelete, onToggleArchive }) {
             date={showFormattedDate(note.createdAt)}
             body={note.body}
             archived={note.archived}
+            navigateTo={navigateTo}
             onDelete={onDelete}
             onToggleArchive={onToggleArchive}
           />

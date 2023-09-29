@@ -7,11 +7,12 @@ function NoteItem({
   body,
   archived,
   onDelete,
+  navigateTo,
   onToggleArchive,
 }) {
   return (
     <div className="note-item">
-      <div className="note-item__content">
+      <div className="note-item__content" onClick={() => navigateTo(`note/${id}`)}>
         <h3 className='note-item__title'>{title}</h3>
         <p className="note-item__date">{date}</p>
         <p className="note-item__body">{body}</p>
