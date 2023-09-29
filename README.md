@@ -16,4 +16,8 @@
 - Animasi loading ketika berpindah halaman dan berpindah daftar catatan/arsip
 - Ketika loading pada saat menambah atau mengubah catatan, transparansi latar belakang menjadi 0.4
 
+### Daftar Catatan
 ![Screenshot](https://github.com/ululazmi41/react_submission_2/blob/main/public/Screenshot.png?raw=true)
+
+### Ubah Catatan
+![Screenshot](https://github.com/ululazmi41/react_submission_2/blob/main/public/Screenshot-2.png?raw=true)
