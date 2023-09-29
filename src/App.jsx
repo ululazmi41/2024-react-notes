@@ -3,6 +3,7 @@ import NoteSearch from './components/NoteSearch';
 import NoteInput from './components/NoteInput';
 import { getInitialData, showFormattedDate } from './utils/index';
 import ActiveNotes from './components/ActiveNotes';
+import Header from './components/layout/header';
 
 class App extends React.Component {
   constructor(props) {
@@ -16,20 +17,66 @@ class App extends React.Component {
       showing: 'notes', // notes | archives | bin
       isLoading: false,
       loadingTimeout: null,
+      currentPage: '', // '' | note
     }
 
-    this.handleSubmit = this.handleSubmit.bind(this);
+    // others
     this.handleSearch = this.handleSearch.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+
+    // actions on note
     this.onDelete = this.onDelete.bind(this);
     this.onToggleArchive = this.onToggleArchive.bind(this);
-    this.doTimeout = this.doTimeout.bind(this);
 
-    // button navigation
+    // home navigation
+    this.doTimeout = this.doTimeout.bind(this); // loading animation
     this.showNotes = this.showNotes.bind(this);
     this.showArchives = this.showArchives.bind(this);
     this.showBin = this.showBin.bind(this);
+
+    // page navigation
+    this.navigateTo = this.navigateTo.bind(this);
+    this.getCurrentPage = this.getCurrentPage.bind(this);
+    this.setCurrentPage = this.setCurrentPage.bind(this);
+    this.handlePopState = this.handlePopState.bind(this);
   }
 
+  /**
+   * Page Navigation
+   */
+  componentDidMount() {
+    window.addEventListener('popstate', this.handlePopState);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('popState', this.handlePopState);
+  }
+
+  getCurrentPage() {
+    const url = window.location.pathname;
+    const page = url.split('/')[1];
+    return page;
+  }
+
+  setCurrentPage(page) {
+    this.setState({
+      currentPage: page,
+    });
+  }
+
+  handlePopState(event) {
+    const page = this.getCurrentPage();
+    this.setCurrentPage(page);
+  }
+
+  navigateTo(page) {
+    history.pushState({}, '', `/${page}`);
+    this.setCurrentPage(page);
+  }
+
+  /**
+   * Others
+   */
   handleSubmit(title, content) {
     const newNote = {
       id: +new Date(),
@@ -57,6 +104,9 @@ class App extends React.Component {
     });
   }
 
+  /**
+   * Actions on note
+   */
   onDelete(id) {
     const filteredNotes = this.state.notes.filter((note) => note.id !== id);
 
@@ -99,8 +149,11 @@ class App extends React.Component {
         });
       }, 1600),
     });
-    }
+  }
 
+  /**
+   * Note Pages
+   */
   showNotes() {
     this.doTimeout();
 
@@ -111,7 +164,7 @@ class App extends React.Component {
 
   showArchives() {
     this.doTimeout();
-    
+
     this.setState({
       showing: 'archives',
     });
@@ -171,32 +224,37 @@ class App extends React.Component {
   }
 
   render() {
-    return (
-      <>
-        <header className="note-app__header">
-          <img className="note-app__header__logo" src="./note.svg" alt="gambar logo website" />
-          <h1>Catatanku</h1>
-        </header>
-        <main className='note-app__body'>
-          <NoteInput onSubmit={this.handleSubmit} />
-          <div className='note-app__body__actions'>
-            <button className="notes-app__body__button-add">Tambah</button>
-            <NoteSearch onChange={this.handleSearch} />
-          </div>
-          <div className="note-app__body__buttons">
-            <button onClick={this.showNotes} className="notes-app__button__selected">Catatan</button>
-            <button onClick={this.showArchives} className="notes-app__button__idle">Arsip</button>
-            <button onClick={this.showBin} className="notes-app__button__idle">Sampah</button>
-          </div>
-          <ActiveNotes
-            notes={this.handleRender()}
-            isLoading={this.state.isLoading}
-            onDelete={this.onDelete}
-            onToggleArchive={this.onToggleArchive}
-          />
-        </main>
-      </>
-    )
+    switch (this.state.currentPage) {
+      case '':
+        return <>
+          <Header />
+          <main className='note-app__body'>
+            <NoteInput onSubmit={this.handleSubmit} />
+            <div className='note-app__body__actions'>
+              <button className="notes-app__body__button-add" onClick={() => this.navigateTo('note')}>Tambah</button>
+              <NoteSearch onChange={this.handleSearch} />
+            </div>
+            <div className="note-app__body__buttons">
+              <button onClick={this.showNotes} className="notes-app__button__selected">Catatan</button>
+              <button onClick={this.showArchives} className="notes-app__button__idle">Arsip</button>
+              <button onClick={this.showBin} className="notes-app__button__idle">Sampah</button>
+            </div>
+            <ActiveNotes
+              notes={this.handleRender()}
+              isLoading={this.state.isLoading}
+              onDelete={this.onDelete}
+              onToggleArchive={this.onToggleArchive}
+            />
+          </main>
+        </>
+      case 'note':
+        return <>
+          <Header />
+          <>Baca Catatan</>
+        </>
+      default:
+        return <>404 Page not Found</>
+    }
   };
 }
 
