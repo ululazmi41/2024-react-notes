@@ -1,7 +1,14 @@
 import React from 'react';
 import { getInitialData } from './utils/index';
-import Home from './page/home';
+import Home from './page/home/Home';
 import Note from './page/Note';
+
+// Toasters
+import ToasterAdded from './components/toaster/ToasterAdded';
+import ToasterEdited from './components/toaster/ToasterEdited';
+import ToasterDeleted from './components/toaster/ToasterDeleted';
+import ToasterArchived from './components/toaster/ToasterArchived';
+import ToasterRestored from './components/toaster/ToasterRestored';
 
 class App extends React.Component {
   constructor(props) {
@@ -11,6 +18,8 @@ class App extends React.Component {
       notes: getInitialData(),
       charsLeft: 50,
       currentPage: '', // '' | note
+      toasters: [],
+      showing: 'notes', // notes | archives
     }
 
     // others
@@ -18,12 +27,58 @@ class App extends React.Component {
     this.handleUpdate = this.handleUpdate.bind(this);
     this.getNoteById = this.getNoteById.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
+    this.addToaster = this.addToaster.bind(this);
 
     // page navigation
     this.navigateTo = this.navigateTo.bind(this);
     this.getCurrentPage = this.getCurrentPage.bind(this);
     this.setCurrentPage = this.setCurrentPage.bind(this);
     this.handlePopState = this.handlePopState.bind(this);
+
+    // home component
+    this.homeNavigateTo = this.homeNavigateTo.bind(this);
+  }
+
+  addToaster(type) {
+    const id = crypto.randomUUID();
+    let toaster = null;
+
+    if (type === 'add') {
+      toaster = <ToasterAdded id={id} />;
+    } else if (type === 'edit') {
+      toaster = <ToasterEdited id={id} />;
+    } else if (type === 'archive') {
+      toaster = <ToasterArchived id={id} />;
+    } else if (type === 'restore') {
+      toaster = <ToasterRestored id={id} />;
+    } else if (type === 'delete') {
+      toaster = <ToasterDeleted id={id} />;
+    } else {
+      //
+    }
+
+    const data = {
+      id: id,
+      element: toaster
+    }
+
+    this.setState((prevStates) => {
+      return {
+        toasters: [
+          ...prevStates.toasters,
+          data,
+        ]
+      };
+    });
+
+    setTimeout(() => {
+      const copy = this.state.toasters;
+      const filtered = copy.filter((toaster) => toaster.id !== id);
+
+      this.setState({
+        toasters: filtered,
+      });
+    }, 2000);
   }
 
   /**
@@ -45,6 +100,8 @@ class App extends React.Component {
         ],
       };
     });
+      
+    this.addToaster('add');
     console.log(`New note added witb title: ${title}`);
   }
 
@@ -60,6 +117,8 @@ class App extends React.Component {
     this.setState({
       notes: copyNotes,
     });
+      
+    this.addToaster('edit');
     console.log(`note updated witb title: ${note.title}`);
   }
 
@@ -112,29 +171,54 @@ class App extends React.Component {
     this.setState({
       notes: filteredNotes,
     })
+      
+    this.addToaster('delete');
 
     console.log(`Note with id of ${id} deleted`)
   }
 
+  homeNavigateTo(page) {
+    this.setState({
+      showing: page,
+    });
+  }
+
   render() {
-    switch (this.state.currentPage) {
-      case '':
-        return <Home
-          notes={this.state.notes}
-          onDelete={this.handleDelete}
-          navigateTo={this.navigateTo}
+    return (
+      <>
+      <div className='toaster-wrapper'>
+        <div className="toasters">
+          {this.state.toasters.map((toaster) => (
+            <React.Fragment key={toaster.id}>
+              {toaster.element}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+      {this.state.currentPage === '' && (
+        <Home
+        notes={this.state.notes}
+        onDelete={this.handleDelete}
+        navigateTo={this.navigateTo}
+        showing={this.state.showing}
+        addToaster={this.addToaster}
+        homeNavigateTo={this.homeNavigateTo}
         />
-      case 'note':
-        return <Note
-          note={this.state.viewingNote}
-          handleSubmit={this.handleSubmit}
-          handleUpdate={this.handleUpdate}
-          navigateTo={this.navigateTo}
-          getNoteById={this.getNoteById}
-        />
-      default:
-        return <>404 Page not Found</>
-    }
+      )}
+      {this.state.currentPage === 'note' && (
+        <Note
+        note={this.state.viewingNote}
+        handleSubmit={this.handleSubmit}
+        handleUpdate={this.handleUpdate}
+        navigateTo={this.navigateTo}
+        getNoteById={this.getNoteById}
+      />
+      )}
+      {!['', 'note'].includes(this.state.currentPage) && (
+        <>404 Page not Found</>
+      )}
+      </>
+    )
   };
 }
 

@@ -4,8 +4,9 @@ import { createRoot } from 'react-dom/client';
 // Styles
 import './styles/dots.css';
 import './styles/style.css';
-import './styles/noteInput.css';
+import './styles/toaster.css';
 import './styles/tailwind.css';
+import './styles/noteInput.css';
 
 // Components
 import App from './App';

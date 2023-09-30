@@ -1,5 +1,5 @@
 import React from 'react';
-import note from '../../public/note.svg';
+import note from '../public/note.svg';
 
 function Header() {
   return (

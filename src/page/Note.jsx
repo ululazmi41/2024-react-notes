@@ -214,6 +214,7 @@ class Note extends React.Component {
             placeholder='Judul'
             className='note-input__title'
             onChange={this.handleTitle}
+            readOnly={this.state.note.archived}
             required
           />
           <p id="tanggal" className='note-input__date'>{showFormattedDate(this.state.note.createdAt)}</p>
@@ -224,6 +225,7 @@ class Note extends React.Component {
             className='note-input__body'
             placeholder='Catatan'
             onChange={this.handleTextarea}
+            readOnly={this.state.note.archived}
             required
           />
           {this.state.isContentEdited

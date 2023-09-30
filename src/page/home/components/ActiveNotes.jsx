@@ -1,19 +1,31 @@
 import React from 'react';
-import { showFormattedDate } from '../utils';
+import { showFormattedDate } from '../../../utils';
 import NoteItem from './NoteItem';
+import note2 from '../../../public/note-2.svg';
 
-function ActiveNotes({ notes, isLoading, navigateTo, onDelete, onToggleArchive }) {
-  if (isLoading) {
+function renderLoading(isLoading, isBlur) {
+  if (isLoading && isBlur) {
     return (
-      <div className="notes-list__loading-wrapper">
+      <div className="notes-list__loading-wrapper tw-bg-40">
         <div className="dots-bars-6 notes-list__loading"></div>
       </div>
-    );
+    )
+  } else if (isLoading) {
+    return (
+      <div className="notes-list__loading-wrapper tw-bg-100">
+        <div className="dots-bars-6 notes-list__loading"></div>
+      </div>
+    )
+  } else {
+    //
   }
+}
 
+function ActiveNotes({ notes, isLoading, isBlur, navigateTo, onDelete, onToggleArchive }) {
   if (notes.length > 0) {
     return (
       <div className="notes-list">
+        {renderLoading(isLoading, isBlur)}
         {notes.map((note) => (
           <NoteItem
             id={note.id}
@@ -30,10 +42,11 @@ function ActiveNotes({ notes, isLoading, navigateTo, onDelete, onToggleArchive }
       </div>
     );
   }
-  
+
   return (
     <div className="notes-list__empty-message">
-      <img src="note-2.svg" alt="tidak ada catatatn" />
+    {renderLoading(isLoading, isBlur)}
+      <img src={note2} alt="tidak ada catatan" />
       <p>Tidak ada catatan</p>
     </div>
   )
