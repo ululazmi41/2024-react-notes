@@ -34,6 +34,10 @@ textarea {
   height: 3.4em;
 }
 
+.note-app__header h1 {
+  cursor: default;
+}
+
 .note-app__header__logo {
   margin-right: 0.4em;
   height: 60%;

@@ -34,6 +34,8 @@ class Note extends React.Component {
     this.handleTextarea = this.handleTextarea.bind(this);
     this.renderCharsLeft = this.renderCharsLeft.bind(this);
     this.getCurrentNoteIndex = this.getCurrentNoteIndex.bind(this);
+
+    this.renderTagArchive = this.renderTagArchive.bind(this);
   }
 
   componentDidMount() {
@@ -49,6 +51,15 @@ class Note extends React.Component {
         state: 'update'
       })
       this.renderNote(note);
+      this.renderTagArchive(note);
+    }
+  }
+
+  renderTagArchive(note) {
+    const tagElement = document.querySelector('.tag');
+
+    if (note.archived) {
+      tagElement.style.display = 'grid';
     }
   }
 
@@ -217,7 +228,10 @@ class Note extends React.Component {
             readOnly={this.state.note.archived}
             required
           />
-          <p id="tanggal" className='note-input__date'>{showFormattedDate(this.state.note.createdAt)}</p>
+          <div className="note-input__date-wrapper">
+            <p id="tanggal" className='note-input__date'>{showFormattedDate(this.state.note.createdAt)}</p>
+            <div className='tag'>Arsip</div>
+          </div>
           <textarea
             id="isi"
             type="text"
