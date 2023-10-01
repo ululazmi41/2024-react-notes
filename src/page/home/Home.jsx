@@ -197,7 +197,7 @@ class Home extends React.Component {
       <>
         <Header />
         <main className='note-app__body'>
-          <button className="notes-app__body__button-add" onClick={() => this.props.navigateTo('note')}>Tambah</button>
+          <button className="notes-app__body__button-add" onClick={() => this.props.navigateTo('note', 250)}>Tambah</button>
           <div className='note-app__body__actions'>
             <div className="note-app__body__buttons">
               <button id="notes" onClick={this.showNotes} className="">Catatan</button>

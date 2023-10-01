@@ -4,11 +4,13 @@ import Home from './page/home/Home';
 import Note from './page/Note';
 
 // Toasters
+import Toasters from './components/Toasters';
 import ToasterAdded from './components/toaster/ToasterAdded';
 import ToasterEdited from './components/toaster/ToasterEdited';
 import ToasterDeleted from './components/toaster/ToasterDeleted';
 import ToasterArchived from './components/toaster/ToasterArchived';
 import ToasterRestored from './components/toaster/ToasterRestored';
+import Loading from './components/Loading';
 
 class App extends React.Component {
   constructor(props) {
@@ -20,6 +22,7 @@ class App extends React.Component {
       currentPage: '', // '' | note
       toasters: [],
       showing: 'notes', // notes | archives
+      isLoading: false,
     }
 
     // others
@@ -31,12 +34,26 @@ class App extends React.Component {
 
     // page navigation
     this.navigateTo = this.navigateTo.bind(this);
+    this.renderLoading = this.renderLoading.bind(this);
+    this.hideLoading = this.hideLoading.bind(this);
     this.getCurrentPage = this.getCurrentPage.bind(this);
     this.setCurrentPage = this.setCurrentPage.bind(this);
     this.handlePopState = this.handlePopState.bind(this);
 
     // home component
     this.homeNavigateTo = this.homeNavigateTo.bind(this);
+  }
+
+  renderLoading() {
+    this.setState({
+      isLoading: true,
+    });
+  }
+
+  hideLoading() {
+    this.setState({
+      isLoading: false,
+    });
   }
 
   addToaster(type) {
@@ -100,7 +117,7 @@ class App extends React.Component {
         ],
       };
     });
-      
+
     this.addToaster('add');
     console.log(`New note added witb title: ${title}`);
   }
@@ -117,7 +134,7 @@ class App extends React.Component {
     this.setState({
       notes: copyNotes,
     });
-      
+
     this.addToaster('edit');
     console.log(`note updated witb title: ${note.title}`);
   }
@@ -139,13 +156,17 @@ class App extends React.Component {
     return note;
   }
 
-  navigateTo(page) {
-    history.pushState({}, '', `/${page}`);
-    if (page.includes('/')) {
-      this.setCurrentPage(page.split('/')[0]);
-    } else {
-      this.setCurrentPage(page);
-    }
+  navigateTo(page, ms) {
+    this.renderLoading();
+    setTimeout(() => {
+      this.hideLoading();
+      history.pushState({}, '', `/${page}`);
+      if (page.includes('/')) {
+        this.setCurrentPage(page.split('/')[0]);
+      } else {
+        this.setCurrentPage(page);
+      }
+    }, ms ? ms : 750);
   }
 
   getCurrentPage() {
@@ -171,7 +192,7 @@ class App extends React.Component {
     this.setState({
       notes: filteredNotes,
     })
-      
+
     this.addToaster('delete');
 
     console.log(`Note with id of ${id} deleted`)
@@ -186,37 +207,34 @@ class App extends React.Component {
   render() {
     return (
       <>
-      <div className='toaster-wrapper'>
-        <div className="toasters">
-          {this.state.toasters.map((toaster) => (
-            <React.Fragment key={toaster.id}>
-              {toaster.element}
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
-      {this.state.currentPage === '' && (
-        <Home
-        notes={this.state.notes}
-        onDelete={this.handleDelete}
-        navigateTo={this.navigateTo}
-        showing={this.state.showing}
-        addToaster={this.addToaster}
-        homeNavigateTo={this.homeNavigateTo}
-        />
-      )}
-      {this.state.currentPage === 'note' && (
-        <Note
-        note={this.state.viewingNote}
-        handleSubmit={this.handleSubmit}
-        handleUpdate={this.handleUpdate}
-        navigateTo={this.navigateTo}
-        getNoteById={this.getNoteById}
-      />
-      )}
-      {!['', 'note'].includes(this.state.currentPage) && (
-        <>404 Page not Found</>
-      )}
+        {this.state.isLoading && (
+          <div>
+            <Loading />
+          </div>
+        )}
+        <Toasters toasters={this.state.toasters} />
+        {this.state.currentPage === '' && (
+          <Home
+            notes={this.state.notes}
+            onDelete={this.handleDelete}
+            navigateTo={this.navigateTo}
+            showing={this.state.showing}
+            addToaster={this.addToaster}
+            homeNavigateTo={this.homeNavigateTo}
+          />
+        )}
+        {this.state.currentPage === 'note' && (
+          <Note
+            note={this.state.viewingNote}
+            handleSubmit={this.handleSubmit}
+            handleUpdate={this.handleUpdate}
+            navigateTo={this.navigateTo}
+            getNoteById={this.getNoteById}
+          />
+        )}
+        {!['', 'note'].includes(this.state.currentPage) && (
+          <>404 Page not Found</>
+        )}
       </>
     )
   };

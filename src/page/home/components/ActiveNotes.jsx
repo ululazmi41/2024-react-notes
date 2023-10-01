@@ -2,19 +2,16 @@ import React from 'react';
 import { showFormattedDate } from '../../../utils';
 import NoteItem from './NoteItem';
 import note2 from '../../../public/note-2.svg';
+import Loading from '../../../components/Loading';
 
 function renderLoading(isLoading, isBlur) {
   if (isLoading && isBlur) {
     return (
-      <div className="notes-list__loading-wrapper tw-bg-40">
-        <div className="dots-bars-6 notes-list__loading"></div>
-      </div>
+      <Loading />
     )
   } else if (isLoading) {
     return (
-      <div className="notes-list__loading-wrapper tw-bg-100">
-        <div className="dots-bars-6 notes-list__loading"></div>
-      </div>
+      <Loading isNoBlur={true} />
     )
   } else {
     //

@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from '../layout/header';
 import { showFormattedDate } from '../utils';
+import Loading from '../components/Loading';
 
 const CHARSLENGTH = 50
 
@@ -16,7 +17,7 @@ class Note extends React.Component {
         createdAt: +new Date(),
         archived: false,
       },
-      state: 'new', // note || update
+      state: 'new', // new || update
       charsLeft: CHARSLENGTH,
       isLoading: false,
       isContentEdited: false,
@@ -88,18 +89,7 @@ class Note extends React.Component {
 
   onSubmit(event) {
     event.preventDefault();
-    this.renderLoading();
-    setTimeout(() => {
-      this.removeLoading();
-      
-      if (this.state.state === 'new') {
-        this.props.handleSubmit(this.state.note.title, this.state.note.body);
-      } else if (this.state.state === 'update') {
-        this.props.handleUpdate(this.state.note);
-      }
-      
-      this.props.navigateTo('');
-    }, 750);
+    this.props.navigateTo('');
   }
 
   updateDate() {
@@ -208,13 +198,11 @@ class Note extends React.Component {
   render() {
     return (
       <>
-        {this.state.isLoading
-          ? (
-            <div className="note-input__loading-wrapper">
-              <div className="dots-bars-6 notes-input__loading"></div>
-            </div>
-          )
-          : <></>}
+        {this.state.isLoading && (
+          <div>
+            <Loading />
+          </div>
+        )}
         <Header />
         <form className='note-input' onSubmit={this.onSubmit}>
           {this.renderCharsLeft()}
@@ -223,7 +211,7 @@ class Note extends React.Component {
             type="text"
             name="judul"
             placeholder='Judul'
-            className='note-input__title'
+            className={this.state.note.archived ? 'note-input__title tw-cursor-default' : 'note-input__title'}
             onChange={this.handleTitle}
             readOnly={this.state.note.archived}
             required
@@ -236,17 +224,18 @@ class Note extends React.Component {
             id="isi"
             type="text"
             name="isi"
-            className='note-input__body'
+            className={this.state.note.archived ? 'note-input__body tw-cursor-default' : 'note-input__body'}
             placeholder='Catatan'
             onChange={this.handleTextarea}
             readOnly={this.state.note.archived}
             required
           />
-          {this.state.isContentEdited
-            ? this.state.state === 'note'
+          {this.state.isContentEdited && (
+            this.state.state === 'new'
               ? <button type="submit">Simpan</button>
               : <button type="submit">Perbarui</button>
-            : <></>}
+          )
+          }
         </form>
       </>
     );

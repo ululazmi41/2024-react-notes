@@ -4,6 +4,13 @@ import iconDelete from '../../../public/delete.svg';
 import iconArchive from '../../../public/bookmark.svg';
 import iconRestore from '../../../public/back-arrow.svg';
 
+function handleNoteItemOnKeyDown(e, id, navigateTo) {
+  const isNoteItemSelected = document.activeElement === document.getElementById(id);
+  if (e.code === 'Enter' && isNoteItemSelected) {
+    navigateTo(`note/${id}`);
+  }
+}
+
 function NoteItem({
   id,
   title,
@@ -15,7 +22,7 @@ function NoteItem({
   onToggleArchive,
 }) {
   return (
-    <div className="note-item">
+    <div id={id} className="note-item" tabIndex={0} onKeyDown={(e) => handleNoteItemOnKeyDown(e, id, navigateTo)}>
       <div className="note-item__content">
         <h3 className='note-item__title' onClick={() => navigateTo(`note/${id}`)}>{title}</h3>
         <p className="note-item__date" onClick={() => navigateTo(`note/${id}`)}>{date}</p>
