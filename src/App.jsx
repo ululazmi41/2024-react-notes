@@ -226,6 +226,7 @@ class App extends React.Component {
             handleSubmit={this.handleSubmit}
             handleUpdate={this.handleUpdate}
             renderLoading={this.renderLoading}
+            homeNavigateTo={this.homeNavigateTo}
           />
         )}
         {!['', 'note'].includes(this.state.currentPage) && (

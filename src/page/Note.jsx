@@ -10,33 +10,34 @@ class Note extends React.Component {
     super(props);
 
     this.state = {
-      note: {
-        id: -1,
-        title: '',
-        body: '',
-        createdAt: +new Date(),
-        archived: false,
-      },
+      id: -1,
+      title: '',
+      body: '',
+      createdAt: +new Date(),
+      archived: false,
       state: 'new', // new || update
       charsLeft: CHARSLENGTH,
       isLoading: false,
       isContentEdited: false,
     }
 
-    this.onSubmit = this.onSubmit.bind(this);
+    // Init
+    this.getCurrentNoteIndex = this.getCurrentNoteIndex.bind(this);
 
+    // Loading
     this.renderLoading = this.renderLoading.bind(this);
     this.removeLoading = this.removeLoading.bind(this);
 
-    this.renderNote = this.renderNote.bind(this);
+    // Others
+    this.onSubmit = this.onSubmit.bind(this);
     this.updateDate = this.updateDate.bind(this);
-
-    this.handleTitle = this.handleTitle.bind(this);
-    this.handleTextarea = this.handleTextarea.bind(this);
+    this.renderNote = this.renderNote.bind(this);
     this.renderCharsLeft = this.renderCharsLeft.bind(this);
-    this.getCurrentNoteIndex = this.getCurrentNoteIndex.bind(this);
-
     this.renderTagArchive = this.renderTagArchive.bind(this);
+
+    // Input onChange handler
+    this.onBodyChangeHandler = this.onBodyChangeHandler.bind(this);
+    this.onTitleChangeHandler = this.onTitleChangeHandler.bind(this);
   }
 
   componentDidMount() {
@@ -48,8 +49,13 @@ class Note extends React.Component {
       //
     } else {
       this.setState({
-        note: note,
-        state: 'update'
+        id: note.id,
+        title: note.title,
+        body: note.body,
+        createdAt: note.createdAt,
+        archived: note.archived,
+        state: 'update',
+        isDateUpdated: false,
       })
       this.renderNote(note);
       this.renderTagArchive(note);
@@ -89,64 +95,58 @@ class Note extends React.Component {
 
   onSubmit(event) {
     event.preventDefault();
-
     this.props.renderLoading(() => {
       if (this.state.state === 'new') {
-        this.props.handleSubmit(this.state.note.title, this.state.note.body);
+        this.props.handleSubmit(this.state.title, this.state.body);
       } else if (this.state.state === 'update') {
-        this.props.handleUpdate(this.state.note);
+        const note = {
+          id: this.state.id,
+          title: this.state.title,
+          body: this.state.body,
+          createdAt: this.state.createdAt,
+          archived: this.state.archived,
+        }
+        this.props.handleUpdate(note);
       }
-
       this.props.navigateTo('');
+      this.props.homeNavigateTo('notes');
     }, 750);
   }
 
   updateDate() {
-    const copyNote = this.state.note;
-    copyNote.createdAt = +new Date();
-
     this.setState({
-      note: copyNote,
+      isDateUpdated: true,
+      createdAt: +new Date(),
     });
-
-    const createdAtElement = document.querySelector('#tanggal');
-    createdAtElement.value = showFormattedDate(copyNote.createdAt);
   }
 
-  handleTitle(event) {
-    const { value } = event.target;
+  onTitleChangeHandler(event) {
+    if (!this.state.isDateUpdated) {
+      this.updateDate();
+    }
 
-    this.updateDate();
-
-    if (value.length > CHARSLENGTH) {
+    if (event.target.value.length > CHARSLENGTH) {
       this.setState({
         charsLeft: 0,
       });
-
-      event.target.value = this.state.note.title;
       return;
     }
 
-    const note = this.state.note;
-    note.title = event.target.value;
-
     this.setState({
-      note: note,
-      charsLeft: CHARSLENGTH - value.length,
+      title: event.target.value,
+      charsLeft: CHARSLENGTH - event.target.value.length,
 
       isContentEdited: true,
     })
   }
 
-  handleTextarea(event) {
-    this.updateDate();
-
-    const note = this.state.note;
-    note.body = event.target.value;
+  onBodyChangeHandler(event) {
+    if (!this.state.isDateUpdated) {
+      this.updateDate();
+    }
 
     this.setState({
-      note: note,
-
+      body: event.target.value,
       isContentEdited: true,
     })
 
@@ -167,7 +167,7 @@ class Note extends React.Component {
     document.querySelector('body').appendChild(wrapper);
 
     // ambil tingginya
-    const height = copyTextarea.scrollHeight - defaultHeight + 50;
+    const height = copyTextarea.scrollHeight - defaultHeight + 150;
 
     // Set ulang tinggi di textarea catatan
     textarea.style.height = `${height}px`;
@@ -220,23 +220,25 @@ class Note extends React.Component {
             type="text"
             name="judul"
             placeholder='Judul'
-            className={this.state.note.archived ? 'note-input__title tw-cursor-default' : 'note-input__title'}
-            onChange={this.handleTitle}
-            readOnly={this.state.note.archived}
+            value={this.state.title}
+            className={this.state.archived ? 'note-input__title tw-cursor-default' : 'note-input__title'}
+            onChange={this.onTitleChangeHandler}
+            readOnly={this.state.archived}
             required
           />
           <div className="note-input__date-wrapper">
-            <p id="tanggal" className='note-input__date'>{showFormattedDate(this.state.note.createdAt)}</p>
+            <p id="tanggal" className='note-input__date'>{showFormattedDate(this.state.createdAt)}</p>
             <div className='tag'>Arsip</div>
           </div>
           <textarea
             id="isi"
             type="text"
             name="isi"
-            className={this.state.note.archived ? 'note-input__body tw-cursor-default' : 'note-input__body'}
+            value={this.state.body}
+            className={this.state.archived ? 'note-input__body tw-cursor-default' : 'note-input__body'}
             placeholder='Catatan'
-            onChange={this.handleTextarea}
-            readOnly={this.state.note.archived}
+            onChange={this.onBodyChangeHandler}
+            readOnly={this.state.archived}
             required
           />
           {this.state.isContentEdited && (

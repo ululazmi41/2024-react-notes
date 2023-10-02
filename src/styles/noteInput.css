@@ -33,6 +33,7 @@
   padding: 0;
   font-size: 14px;
   text-align: left;
+  pointer-events: none;
 }
 
 .note-input__date-wrapper {
