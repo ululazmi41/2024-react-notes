@@ -35,7 +35,6 @@ class App extends React.Component {
     // page navigation
     this.navigateTo = this.navigateTo.bind(this);
     this.renderLoading = this.renderLoading.bind(this);
-    this.hideLoading = this.hideLoading.bind(this);
     this.getCurrentPage = this.getCurrentPage.bind(this);
     this.setCurrentPage = this.setCurrentPage.bind(this);
     this.handlePopState = this.handlePopState.bind(this);
@@ -44,16 +43,15 @@ class App extends React.Component {
     this.homeNavigateTo = this.homeNavigateTo.bind(this);
   }
 
-  renderLoading() {
-    this.setState({
-      isLoading: true,
-    });
-  }
+  renderLoading(func, ms) {
+    this.setState({ isLoading: true });
+    setTimeout(() => {
+      this.setState({ isLoading: false });
 
-  hideLoading() {
-    this.setState({
-      isLoading: false,
-    });
+      if (func) {
+        func();
+      }
+    }, ms ? ms : 750);
   }
 
   addToaster(type) {
@@ -156,17 +154,13 @@ class App extends React.Component {
     return note;
   }
 
-  navigateTo(page, ms) {
-    this.renderLoading();
-    setTimeout(() => {
-      this.hideLoading();
-      history.pushState({}, '', `/${page}`);
-      if (page.includes('/')) {
-        this.setCurrentPage(page.split('/')[0]);
-      } else {
-        this.setCurrentPage(page);
-      }
-    }, ms ? ms : 750);
+  navigateTo(page) {
+    history.pushState({}, '', `/${page}`);
+    if (page.includes('/')) {
+      this.setCurrentPage(page.split('/')[0]);
+    } else {
+      this.setCurrentPage(page);
+    }
   }
 
   getCurrentPage() {
@@ -216,20 +210,22 @@ class App extends React.Component {
         {this.state.currentPage === '' && (
           <Home
             notes={this.state.notes}
-            onDelete={this.handleDelete}
-            navigateTo={this.navigateTo}
             showing={this.state.showing}
+            onDelete={this.handleDelete}
             addToaster={this.addToaster}
+            navigateTo={this.navigateTo}
+            renderLoading={this.renderLoading}
             homeNavigateTo={this.homeNavigateTo}
           />
         )}
         {this.state.currentPage === 'note' && (
           <Note
             note={this.state.viewingNote}
-            handleSubmit={this.handleSubmit}
-            handleUpdate={this.handleUpdate}
             navigateTo={this.navigateTo}
             getNoteById={this.getNoteById}
+            handleSubmit={this.handleSubmit}
+            handleUpdate={this.handleUpdate}
+            renderLoading={this.renderLoading}
           />
         )}
         {!['', 'note'].includes(this.state.currentPage) && (

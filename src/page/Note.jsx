@@ -89,7 +89,16 @@ class Note extends React.Component {
 
   onSubmit(event) {
     event.preventDefault();
-    this.props.navigateTo('');
+
+    this.props.renderLoading(() => {
+      if (this.state.state === 'new') {
+        this.props.handleSubmit(this.state.note.title, this.state.note.body);
+      } else if (this.state.state === 'update') {
+        this.props.handleUpdate(this.state.note);
+      }
+
+      this.props.navigateTo('');
+    }, 750);
   }
 
   updateDate() {

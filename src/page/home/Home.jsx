@@ -17,6 +17,7 @@ class Home extends React.Component {
 
     // Others
     this.handleNotes = this.handleNotes.bind(this);
+    this.handleNavigateToAdd = this.handleNavigateToAdd.bind(this);
 
     // Search
     this.handleSearch = this.handleSearch.bind(this);
@@ -192,12 +193,18 @@ class Home extends React.Component {
     }
   }
 
+  handleNavigateToAdd() {
+    this.props.renderLoading(() => {
+      this.props.navigateTo('note');
+    }, 250);
+  }
+
   render() {
     return (
       <>
         <Header />
         <main className='note-app__body'>
-          <button className="notes-app__body__button-add" onClick={() => this.props.navigateTo('note', 250)}>Tambah</button>
+          <button className="notes-app__body__button-add" onClick={this.handleNavigateToAdd}>Tambah</button>
           <div className='note-app__body__actions'>
             <div className="note-app__body__buttons">
               <button id="notes" onClick={this.showNotes} className="">Catatan</button>
