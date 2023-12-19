@@ -15,7 +15,7 @@ import NoteEmpty from '../components/NoteEmpty';
 import { showFormattedDate } from '../utils';
 
 // Router
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 // Toast
 import toast from 'react-hot-toast';
@@ -24,10 +24,25 @@ function Home({ notes, showing, onDelete, homeNavigateTo, setNotes }) {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [initialized, setInitialized] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [loadingTimeout, setLoadingTimeout] = useState(null);
 
+  function handleSearch(keyword) {
+    if (keyword === null || keyword === undefined || keyword === '') {
+      setSearch('');
+      setSearchParams({});
+    } else {
+      setSearch(keyword.toLowerCase());
+      setSearchParams({ q: keyword });
+    }
+  }
+
   useEffect(() => {
+    const keyword = searchParams.get('q');
+    handleSearch(keyword);
     renderNavigationButton(showing);
+    setInitialized(true);
   }, []);
 
   function renderNavigationButton(page) {
@@ -151,17 +166,17 @@ function Home({ notes, showing, onDelete, homeNavigateTo, setNotes }) {
             <button id="notes" onClick={() => showPage('notes')} className="">Catatan</button>
             <button id="archives" onClick={() => showPage('archives')} className="">Arsip</button>
           </div>
-          <Search onChange={(event) => setSearch(event.target.value.toLowerCase())} />
+          <Search value={search} onChange={(event) => handleSearch(event.target.value)} />
         </div>
         <div className="relative">
           {isLoading && <Loading />}
-          {filteredNotes.length > 0
+          {initialized && (filteredNotes.length > 0
             ? <NoteList
               notes={filteredNotes}
               onDelete={handleDelete}
               onToggleArchive={onToggleArchive}
             />
-            : <NoteEmpty />}
+            : <NoteEmpty />)}
         </div>
       </main>
     </>

@@ -3,15 +3,16 @@ import React from 'react';
 // Third-party
 import PropTypes from 'prop-types';
 
-function NoteSearch({ onChange }) {
+function NoteSearch({ value, onChange }) {
   return (
-    <form className='note-search' onChange={onChange} onSubmit={(e) => e.preventDefault()}>
-      <input type="text" name="kueri" id="kueri" placeholder='Cari catatan ...' />
+    <form className='note-search' onSubmit={(e) => e.preventDefault()}>
+      <input type="text" name="kueri" id="kueri" value={value} onChange={onChange} placeholder='Cari catatan ...' />
     </form>
   );
 }
 
 NoteSearch.propTypes = {
+  value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
 }
 

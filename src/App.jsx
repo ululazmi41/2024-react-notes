@@ -16,6 +16,7 @@ import toast, { Toaster } from 'react-hot-toast';
 // Route
 import { Route, Routes } from 'react-router-dom';
 import { homeRoute, notesRoute } from './consts/routes';
+import PageNotFound from './pages/PageNotFound';
 
 function App() {
   const [notes, setNotes] = useState(() => getInitialData());
@@ -107,7 +108,7 @@ function App() {
             renderLoading={renderLoading}
             homeNavigateTo={homeNavigateTo}
           />} />
-        <Route path="*" element={<div>404 Page not Found</div>} />
+        <Route path="*" element={<PageNotFound />} />
       </Routes>
     </>
   )

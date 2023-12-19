@@ -7,7 +7,7 @@ function NoteEmpty() {
   return (
     <div className="notes-list__empty-message">
       <img src={iconNote2} alt="tidak ada catatan" />
-      <p>Tidak ada catatan</p>
+      <p>Catatan kosong</p>
     </div>
   )
 }

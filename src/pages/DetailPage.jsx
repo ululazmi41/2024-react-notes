@@ -14,6 +14,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 // Utils
 import { showFormattedDate } from '../utils';
+import PageNotFound from './PageNotFound';
 
 const CHARSLENGTH = 50;
 
@@ -22,6 +23,7 @@ function DetailPage({ getNoteById, isLoading, renderLoading, handleUpdate, homeN
   const navigate = useNavigate();
   const [state, setState] = useState('new'); // new || update
   const [charsLeft, setCharsLeft] = useState(CHARSLENGTH);
+  const [isNoteExist, setIsNoteExist] = useState(true);
   const [isDateUpdated, setIsDateUpdated] = useState(false);
   const [isContentEdited, setIsContentEdited] = useState(false);
   const [note, setNote] = useState({
@@ -33,12 +35,13 @@ function DetailPage({ getNoteById, isLoading, renderLoading, handleUpdate, homeN
   });
 
   useEffect(() => {
-    const noteIndex = id;
-    const index = parseInt(noteIndex);
+    const index = parseInt(id);
     const note = getNoteById(index);
 
     if (note === null || note === undefined) {
-      //
+      if (id !== 'new') {
+        setIsNoteExist(false);
+      }
     } else {
       const parsedNote = {
         id: note.id,
@@ -179,6 +182,10 @@ function DetailPage({ getNoteById, isLoading, renderLoading, handleUpdate, homeN
     }
   }
 
+  if (!isNoteExist) {
+    return <PageNotFound />
+  }
+  
   return (
     <>
       {isLoading && <Loading />}
