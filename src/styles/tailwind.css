@@ -1,3 +1,7 @@
+.relative {
+  position: relative;
+}
+
 .tw-w-100 {
   width: 100vw;
 }
