@@ -2,6 +2,30 @@
   position: relative;
 }
 
+.grid {
+  display: grid;
+}
+
+.text-red {
+  color: red;
+}
+
+.border-red {
+  border-color: red;
+}
+
+.placeholder-red::placeholder {
+  color: red;
+}
+
+.mt-2px {
+  margin-top: 2px;
+}
+
+.text-11pt {
+  font-size: 11pt;
+}
+
 .tw-w-100 {
   width: 100vw;
 }

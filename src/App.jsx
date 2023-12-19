@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // Helpers
 import { getInitialData } from './utils/index';
@@ -6,22 +6,69 @@ import { getInitialData } from './utils/index';
 // Components
 import Loading from './components/Loading';
 
-// Pages
-import HomePage from './pages/HomePage';
-import DetailPage from './pages/DetailPage';
-
 // Toasters
 import toast, { Toaster } from 'react-hot-toast';
 
 // Route
-import { Route, Routes } from 'react-router-dom';
-import { homeRoute, notesRoute } from './consts/routes';
+import { Route, Routes, useNavigate } from 'react-router-dom';
+import { homeRoute, loginRoute, notesRoute } from './consts/routes';
 import PageNotFound from './pages/PageNotFound';
+
+// Pages
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import DetailPage from './pages/DetailPage';
+import RegisterPage from './pages/Registerpage';
+
+// Contexts
+import { AuthProvider } from './contexts/authContext';
+import { DarkmodeProvider } from './contexts/themecontext';
+
+function GotoLogin() {
+  const navigate = useNavigate();
+  useEffect(() => navigate(loginRoute), []);
+
+  return (<></>);
+}
 
 function App() {
   const [notes, setNotes] = useState(() => getInitialData());
-  const [isLoading, setIsLoading] = useState(false);
+  const [authUser, setAuthUser] = useState(1);
   const [showing, setShowing] = useState('notes');
+  
+  // Booleans
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isDarkmode, setDarkmode] = useState(false);
+
+  function toggleDarkmode() {
+    setDarkmode((prevState) => {
+      localStorage.setItem('darkmode', JSON.stringify(!prevState));
+      return !prevState;
+    });
+  }
+
+  useEffect(() => {
+    const localTheme = JSON.parse(localStorage.getItem('darkmode')) || false;
+    console.log(localTheme, isDarkmode);
+    setDarkmode(localTheme);
+  }, []);
+
+  function toggleAuthStatus(value = null) {
+    setIsLoggedIn((prevState) => {
+      if (value) {
+        if (value === false) {
+          setAuthUser(null);
+        }
+        return value;
+      }
+
+      if (!prevState === false) {
+        setAuthUser(null);
+      }
+      return !prevState;
+    })
+  }
 
   function renderLoading(func, ms) {
     setIsLoading(true);
@@ -85,33 +132,49 @@ function App() {
     setShowing(page);
   }
 
+  if (authUser === null) {
+    return (
+      <DarkmodeProvider value={{ isDarkmode, toggleDarkmode }}>
+        <Routes>
+          <Route path="/*" element={<GotoLogin />} />
+          <Route path="/login" element={<LoginPage toggleAuthStatus={toggleAuthStatus} setAuthUser={setAuthUser} />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Routes>
+      </DarkmodeProvider>
+    )
+  }
+
   return (
-    <>
-      {isLoading && <Loading />}
-      <Toaster position="top-right" />
-      <Routes>
-        <Route path={homeRoute} element={
-          <HomePage
-            notes={notes}
-            showing={showing}
-            setNotes={setNotes}
-            onDelete={handleDelete}
-            renderLoading={renderLoading}
-            homeNavigateTo={homeNavigateTo}
-          />} />
-        <Route path={`${notesRoute}/:id`} element={
-          <DetailPage
-            isLoading={isLoading}
-            getNoteById={getNoteById}
-            handleSubmit={handleSubmit}
-            handleUpdate={handleUpdate}
-            renderLoading={renderLoading}
-            homeNavigateTo={homeNavigateTo}
-          />} />
-        <Route path="*" element={<PageNotFound />} />
-      </Routes>
-    </>
-  )
+    <DarkmodeProvider value={{ isDarkmode, toggleDarkmode }}>
+      <AuthProvider value={{ isLoggedIn, toggleAuthStatus }}>
+        {isLoading && <Loading />}
+        <Toaster position="top-right" />
+        <Routes>
+          <Route path={homeRoute} element={
+            <HomePage
+              notes={notes}
+              showing={showing}
+              setNotes={setNotes}
+              onDelete={handleDelete}
+              renderLoading={renderLoading}
+              homeNavigateTo={homeNavigateTo}
+            />} />
+          <Route path={`${notesRoute}/:id`} element={
+            <DetailPage
+              isLoading={isLoading}
+              getNoteById={getNoteById}
+              handleSubmit={handleSubmit}
+              handleUpdate={handleUpdate}
+              renderLoading={renderLoading}
+              homeNavigateTo={homeNavigateTo}
+            />} />
+          <Route path="/login" element={<LoginPage setAuthUser={setAuthUser} toggleAuthStatus={toggleAuthStatus} />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="*" element={<PageNotFound />} />
+        </Routes>
+      </AuthProvider>
+    </DarkmodeProvider>
+  );
 }
 
 export default App;

@@ -1,0 +1,52 @@
+.note-auth__wrapper {
+  height: 60vh;
+  display: grid;
+  align-content: center;
+}
+
+.note-auth__header {
+  display: flex;
+  margin: auto;
+
+  width: 24em;
+  height: 3.4em;
+  padding: 4px 16px;
+
+  align-items: center;
+  justify-content: center;
+}
+
+.note-auth__header h2 {
+  margin: 8px 0;
+  cursor: default;
+  color: #24B655;
+}
+
+.note-auth__body {
+  width: 18em;
+  margin: 1em auto;
+}
+
+.note-auth__input {
+  width: 100%;
+}
+
+.notes-auth__button {
+  padding: 10px 18px;
+  margin-top: 1em;
+  
+  cursor: pointer;
+  background: none;
+  border-radius: 6px;
+  height: max-content;
+  border-style: solid;
+
+  color: white;
+  border-color: #24B655;
+  background-color: #24B655;
+}
+
+.notes-auth__button:hover {
+  border-color: #46ce73;
+  background-color: #46ce73;
+}
