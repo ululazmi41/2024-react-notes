@@ -43,14 +43,30 @@ const getInitialData = () => ([
   },
 ]);
 
-const showFormattedDate = (date) => {
+const showFormattedDate = (date, language) => {
   const options = {
     weekday: "long",
     year: "numeric",
     month: "long",
     day: "numeric"
   }
-  return new Date(date).toLocaleDateString("id-ID", options)
+
+  function processLanguage(language) {
+    if (!language) {
+      return "id-ID";
+    }
+
+    if (language === "id") {
+      return "id-ID";
+    } else if (language === "en") {
+      return "en-EN";
+    } else {
+      console.warning(`Unknown language: ${language}, returning default (indonesia) language`);
+      return "id-ID";
+    }
+  }
+  const prosessedLanguage = processLanguage(language);
+  return new Date(date).toLocaleDateString(prosessedLanguage, options)
 }
 
 export { getInitialData, showFormattedDate };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 
 // Icons
 import Header from '../layout/header';
@@ -8,6 +8,11 @@ import useInput from '../hooks/input';
 import PropTypes from 'prop-types';
 import { validateEmail } from '../helpers/validateEmai';
 import { validatePassword } from '../helpers/validatePassword';
+
+// Localization
+import localization from '../consts/i10n';
+import LanguageContext from '../contexts/languageContext';
+import { toTitleCase } from '../helpers/helpers';
 
 function LoginPage({ toggleAuthStatus, setAuthUser }) {
   const navigate = useNavigate();
@@ -19,6 +24,10 @@ function LoginPage({ toggleAuthStatus, setAuthUser }) {
   // Password
   const [password, passwordChangeHandler] = useInput('');
   const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
+
+  // Localization
+  const { language } = useContext(LanguageContext);
+  const { login, dontHaveAccount, register, submit, emailAddress } = localization[language];
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -68,7 +77,7 @@ function LoginPage({ toggleAuthStatus, setAuthUser }) {
       <Header />
       <div className="note-auth__wrapper">
         <div className="note-auth__header">
-          <h2>Login</h2>
+          <h2>{toTitleCase(login)}</h2>
         </div>
         <main className="note-auth__body">
           <form className="grid" onSubmit={handleSubmit}>
@@ -77,15 +86,15 @@ function LoginPage({ toggleAuthStatus, setAuthUser }) {
             className={"note-auth__input" + (isEmailInvalid && " text-red border-red placeholder-red")}
             defaultValue={email}
             onChange={(e) => emailChangeHandlerWrapper(e.target.value)}
-            placeholder="email ..." />
+            placeholder={emailAddress} />
             <input
             type="password"
             className={"note-auth__input" + (isPasswordInvalid && " text-red border-red placeholder-red")}
             defaultValue={password}
             onChange={(e) => passwordChangeHandlerWrapper(e.target.value)}
-            placeholder="password ..." />
-            <p className="auth-nav-description">Dont`t have an account? <Link className="auth-nav" to={registerRoute}>Register</Link></p>
-            <button className="notes-auth__button">Submit</button>
+            placeholder="Password" />
+            <p className="auth-nav-description">{dontHaveAccount} <Link className="auth-nav" to={registerRoute}>{register}</Link></p>
+            <button className="notes-auth__button">{submit}</button>
           </form>
         </main>
       </div>

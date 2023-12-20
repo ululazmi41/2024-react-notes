@@ -2,8 +2,10 @@
 
 :root {
   --loading: #666;
+  --brand-color: #24B655;
   --loading-background: rgba(255, 255, 255, 0.4);
   --add-button: #24B655;
+  --add-button-hover: #46ce73;
   --logout-color: #666;
   --background-color: #eee;
   --note-card-delete-color: #ff5f52;

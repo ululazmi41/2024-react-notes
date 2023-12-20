@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Header from '../layout/header';
 import useInput from '../hooks/input';
 import { loginRoute } from '../consts/routes';
 import { Link, useNavigate } from 'react-router-dom';
 import { validateEmail } from '../helpers/validateEmai';
 import { validatePassword } from '../helpers/validatePassword';
+
+// Localization
+import localization from '../consts/i10n';
+import LanguageContext from '../contexts/languageContext';
+import { toTitleCase } from '../helpers/helpers';
 
 function RegisterPage() {
   const navigate = useNavigate();
@@ -20,6 +25,10 @@ function RegisterPage() {
   // Confirm Password
   const [confirmPassword, confirmPasswordChangeHandler] = useInput('');
   const [isConfirmPasswordInvalid, setIsConfirmPasswordInvalid] = useState(false);
+
+  // Localization
+  const { language } = useContext(LanguageContext);
+  const { submit, login, register, alreadyHaveAccount, emailAddress, confirmPassword: confirmPasswordLocalization } = localization[language];
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -75,7 +84,7 @@ function RegisterPage() {
     <Header />
     <div className="note-auth__wrapper">
       <div className="note-auth__header">
-        <h2>Register</h2>
+        <h2>{toTitleCase(register)}</h2>
       </div>
       <main className="note-auth__body">
         <form className="grid" onSubmit={handleSubmit}>
@@ -84,21 +93,21 @@ function RegisterPage() {
               className={"note-auth__input" + (isEmailInvalid && " text-red border-red placeholder-red")}
               defaultValue={email}
               onChange={(e) => emailChangeHandlerWrapper(e.target.value)}
-              placeholder="email ..." />
+              placeholder={emailAddress} />
             <input
               type="password"
               className={"note-auth__input" + (isPasswordInvalid && " text-red border-red placeholder-red")}
               defaultValue={password}
               onChange={(e) => passwordChangeHandlerWrapper(e.target.value)}
-              placeholder="password ..." />
+              placeholder="Password" />
             <input
               type="password"
               className={"note-auth__input" + (isConfirmPasswordInvalid && " text-red border-red placeholder-red")}
               defaultValue={confirmPassword}
               onChange={(e) => confirmPasswordChangeHandlerWrapper(e.target.value)}
-              placeholder="confirm password ..." />
-          <p className="auth-nav-description">Already have an account? <Link className="auth-nav" to={loginRoute}>Login</Link></p>
-          <button className="notes-auth__button">Submit</button>
+              placeholder={confirmPasswordLocalization} />
+          <p className="auth-nav-description">{alreadyHaveAccount} <Link className="auth-nav" to={loginRoute}>{toTitleCase(login)}</Link></p>
+          <button className="notes-auth__button">{submit}</button>
         </form>
       </main>
     </div>

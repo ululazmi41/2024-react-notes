@@ -11,7 +11,7 @@ import toast, { Toaster } from 'react-hot-toast';
 
 // Route
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import { homeRoute, loginRoute, notesRoute } from './consts/routes';
+import { homeRoute, loginRoute, notesRoute, registerRoute } from './consts/routes';
 import PageNotFound from './pages/PageNotFound';
 
 // Pages
@@ -23,6 +23,7 @@ import RegisterPage from './pages/Registerpage';
 // Contexts
 import { AuthProvider } from './contexts/authContext';
 import { DarkmodeProvider } from './contexts/themecontext';
+import { LanguageProvider } from './contexts/languageContext';
 
 function GotoLogin() {
   const navigate = useNavigate();
@@ -40,13 +41,33 @@ function GotoHomePage() {
 
 function App() {
   const [notes, setNotes] = useState(() => getInitialData());
-  const [authUser, setAuthUser] = useState(1);
+  const [authUser, setAuthUser] = useState(null);
   const [showing, setShowing] = useState('notes');
 
   // Booleans
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isDarkmode, setDarkmode] = useState(false);
+  const [isDarkmode, setDarkmode] = useState(false); // TOOD: refactor
+  const [language, setLanguage] = useState('en');
+  const [initialized, setInitialized] = useState(false);
+
+  useEffect(() => {
+    const localTheme = JSON.parse(localStorage.getItem('darkmode')) || false;
+    const localLanguage = JSON.parse(localStorage.getItem('lang')) || 'en';
+
+    // Init Theme
+    document.documentElement.setAttribute('data-theme', localTheme);
+    setDataTheme(localTheme);
+    setDarkmode(localTheme);
+
+    // Init Language
+    document.documentElement.setAttribute('lang', localLanguage);
+    setDataLanguage(localLanguage);
+    setLanguage(localLanguage);
+
+    // Set initialized
+    setInitialized(true);
+  }, []);
 
   function setDataTheme(isDarkmode) {
     if (isDarkmode) {
@@ -56,18 +77,24 @@ function App() {
     }
   }
 
-  useEffect(() => {
-    const localTheme = JSON.parse(localStorage.getItem('darkmode')) || false;
-    document.documentElement.setAttribute('data-theme', localTheme);
-    setDataTheme(localTheme);
-    setDarkmode(localTheme);
-  }, []);
+  function setDataLanguage(language) {
+    document.documentElement.setAttribute('lang', language);
+  }
 
   function toggleDarkmode() {
     setDarkmode((prevState) => {
       localStorage.setItem('darkmode', JSON.stringify(!prevState));
       setDataTheme(!prevState);
       return !prevState;
+    });
+  }
+
+  function toggleLanguage() {
+    setLanguage((prevLanguage) => {
+      const reverted = prevLanguage === 'en' ? 'id' : 'en';
+      localStorage.setItem('lang', JSON.stringify(reverted));
+      setDataLanguage(reverted);
+      return reverted;
     });
   }
 
@@ -151,46 +178,54 @@ function App() {
 
   if (authUser === null) {
     return (
-      <DarkmodeProvider value={{ isDarkmode, toggleDarkmode }}>
-        <Routes>
-          <Route path="/*" element={<GotoLogin />} />
-          <Route path="/login" element={<LoginPage toggleAuthStatus={toggleAuthStatus} setAuthUser={setAuthUser} />} />
-          <Route path="/register" element={<RegisterPage />} />
-        </Routes>
-      </DarkmodeProvider>
+      <div className={initialized ? '' : 'display-none'}>
+        <DarkmodeProvider value={{ isDarkmode, toggleDarkmode }}>
+          <LanguageProvider value={{ language, toggleLanguage }}>
+            <Routes>
+              <Route path={loginRoute} element={<LoginPage toggleAuthStatus={toggleAuthStatus} setAuthUser={setAuthUser} />} />
+              <Route path={registerRoute} element={<RegisterPage />} />
+              <Route path="*" element={<GotoLogin />} />
+            </Routes>
+          </LanguageProvider>
+        </DarkmodeProvider>
+      </div>
     )
   }
 
   return (
-    <DarkmodeProvider value={{ isDarkmode, toggleDarkmode }}>
-      <AuthProvider value={{ isLoggedIn, toggleAuthStatus }}>
-        {isLoading && <Loading />}
-        <Toaster position="top-right" />
-        <Routes>
-          <Route path={homeRoute} element={
-            <HomePage
-              notes={notes}
-              showing={showing}
-              setNotes={setNotes}
-              onDelete={handleDelete}
-              renderLoading={renderLoading}
-              homeNavigateTo={homeNavigateTo}
-            />} />
-          <Route path={`${notesRoute}/:id`} element={
-            <DetailPage
-              isLoading={isLoading}
-              getNoteById={getNoteById}
-              handleSubmit={handleSubmit}
-              handleUpdate={handleUpdate}
-              renderLoading={renderLoading}
-              homeNavigateTo={homeNavigateTo}
-            />} />
-          <Route path="/login" element={<GotoHomePage />} />
-          <Route path="/register" element={<GotoHomePage />} />
-          <Route path="*" element={<PageNotFound />} />
-        </Routes>
-      </AuthProvider>
-    </DarkmodeProvider>
+    <div className={initialized ? '' : 'display-none'}>
+      <DarkmodeProvider value={{ isDarkmode, toggleDarkmode }}>
+        <LanguageProvider value={{ language, toggleLanguage }}>
+          <AuthProvider value={{ isLoggedIn, toggleAuthStatus }}>
+            {isLoading && <Loading />}
+            <Toaster position="top-right" />
+            <Routes>
+              <Route path={homeRoute} element={
+                <HomePage
+                  notes={notes}
+                  showing={showing}
+                  setNotes={setNotes}
+                  onDelete={handleDelete}
+                  renderLoading={renderLoading}
+                  homeNavigateTo={homeNavigateTo}
+                />} />
+              <Route path={`${notesRoute}/:id`} element={
+                <DetailPage
+                  isLoading={isLoading}
+                  getNoteById={getNoteById}
+                  handleSubmit={handleSubmit}
+                  handleUpdate={handleUpdate}
+                  renderLoading={renderLoading}
+                  homeNavigateTo={homeNavigateTo}
+                />} />
+              <Route path={loginRoute} element={<GotoHomePage />} />
+              <Route path={registerRoute} element={<GotoHomePage />} />
+              <Route path="*" element={<PageNotFound />} />
+            </Routes>
+          </AuthProvider>
+        </LanguageProvider>
+      </DarkmodeProvider>
+    </div>
   );
 }
 

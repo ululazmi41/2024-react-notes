@@ -1,9 +1,16 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Header from '../layout/header';
 import { Link } from 'react-router-dom';
 import { homeRoute } from '../consts/routes';
 
+// Localization
+import localization from '../consts/i10n';
+import LanguageContext from '../contexts/languageContext';
+
 function PageNotFound() {
+  const { language } = useContext(LanguageContext);
+  const { pageNotExistGoto, homePage } = localization[language];
+  
   return (
     <>
       <Header />
@@ -25,10 +32,10 @@ function PageNotFound() {
           textAlign: 'center',
           marginBottom: '0.6em',
         }}>Page not Found</p>
-        <p>The page you are looking for doesn`t exist. Go to</p>
+        <p>{pageNotExistGoto}</p>
         <p style={{
           textAlign: 'center',
-        }}><Link to={homeRoute}>Home Page</Link></p>
+        }}><Link to={homeRoute}>{homePage}</Link></p>
       </div>
     </>
   )

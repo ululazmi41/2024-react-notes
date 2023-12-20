@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 // Third-party
 import PropTypes from 'prop-types';
@@ -16,10 +16,18 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { showFormattedDate } from '../utils';
 import PageNotFound from './PageNotFound';
 
+// Localization
+import localization from '../consts/i10n';
+import LanguageContext from '../contexts/languageContext';
+
+// Consts
 const CHARSLENGTH = 50;
 
+// Helpers
+import { toTitleCase } from '../helpers/helpers';
+
 function DetailPage({ getNoteById, isLoading, renderLoading, handleUpdate, homeNavigateTo, handleSubmit }) {
-  const {id } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const [state, setState] = useState('new'); // new || update
   const [charsLeft, setCharsLeft] = useState(CHARSLENGTH);
@@ -33,6 +41,10 @@ function DetailPage({ getNoteById, isLoading, renderLoading, handleUpdate, homeN
     createdAt: +new Date(),
     archived: false,
   });
+
+  // Localization
+  const { language } = useContext(LanguageContext);
+  const { archived, submitNote, updateNote } = localization[language];
 
   useEffect(() => {
     const index = parseInt(id);
@@ -53,7 +65,7 @@ function DetailPage({ getNoteById, isLoading, renderLoading, handleUpdate, homeN
       setNote(parsedNote);
       setState('update');
       setIsDateUpdated(false);
-      
+
       renderNote(parsedNote);
       renderTagArchive(note);
     }
@@ -185,7 +197,7 @@ function DetailPage({ getNoteById, isLoading, renderLoading, handleUpdate, homeN
   if (!isNoteExist) {
     return <PageNotFound />
   }
-  
+
   return (
     <>
       {isLoading && <Loading />}
@@ -204,8 +216,8 @@ function DetailPage({ getNoteById, isLoading, renderLoading, handleUpdate, homeN
           required
         />
         <div className="note-input__date-wrapper">
-          <p id="tanggal" className='note-input__date'>{showFormattedDate(note.createdAt)}</p>
-          <div className='tag'>Arsip</div>
+          <p id="tanggal" className='note-input__date'>{showFormattedDate(note.createdAt, language)}</p>
+          <div className='tag'>{toTitleCase(archived)}</div>
         </div>
         <textarea
           id="isi"
@@ -220,10 +232,9 @@ function DetailPage({ getNoteById, isLoading, renderLoading, handleUpdate, homeN
         />
         {isContentEdited && (
           state === 'new'
-            ? <button type="submit">Simpan</button>
-            : <button type="submit">Perbarui</button>
-        )
-        }
+            ? <button type="submit">{submitNote}</button>
+            : <button type="submit">{updateNote}</button>
+        )}
       </form>
     </>
   );

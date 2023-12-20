@@ -35,6 +35,7 @@
 
 .note-input__title {
   font-size: 14pt;
+  font-weight: bold;
   margin: 4px 0 0;
   padding: 0;
   color: var(--font-color);

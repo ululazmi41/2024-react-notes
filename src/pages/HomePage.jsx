@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 // Third-party
 import PropTypes from 'prop-types';
@@ -20,6 +20,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 // Toast
 import toast from 'react-hot-toast';
 
+// Localization
+import localization from '../consts/i10n'; 
+import LanguageContext from '../contexts/languageContext';
+
 function Home({ notes, showing, onDelete, homeNavigateTo, setNotes }) {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
@@ -27,6 +31,10 @@ function Home({ notes, showing, onDelete, homeNavigateTo, setNotes }) {
   const [initialized, setInitialized] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const [loadingTimeout, setLoadingTimeout] = useState(null);
+
+  // Localization
+  const { language } = useContext(LanguageContext);
+  const { add, notes: notesLocalization, archives } = localization[language];
 
   function handleSearch(keyword) {
     if (keyword === null || keyword === undefined || keyword === '') {
@@ -161,11 +169,11 @@ function Home({ notes, showing, onDelete, homeNavigateTo, setNotes }) {
     <>
       <Header />
       <main className="note-app__body">
-        <button className="notes-app__body__button-add" onClick={() => navigate("notes/new")}>Tambah</button>
+        <button className="notes-app__body__button-add" onClick={() => navigate("notes/new")}>{add}</button>
         <div className="note-app__body__actions">
           <div className="note-app__body__buttons">
-            <button id="notes" onClick={() => showPage("notes")} className="">Catatan</button>
-            <button id="archives" onClick={() => showPage("archives")} className="">Arsip</button>
+            <button id="notes" onClick={() => showPage("notes")} className="">{notesLocalization}</button>
+            <button id="archives" onClick={() => showPage("archives")} className="">{archives}</button>
           </div>
           <Search value={search} onChange={(event) => handleSearch(event.target.value)} />
         </div>
