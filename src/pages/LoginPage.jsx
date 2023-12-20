@@ -13,8 +13,9 @@ import { validatePassword } from '../helpers/validatePassword';
 import localization from '../consts/i10n';
 import LanguageContext from '../contexts/languageContext';
 import { toTitleCase } from '../helpers/helpers';
+import Loading from '../components/Loading';
 
-function LoginPage({ toggleAuthStatus, setAuthUser }) {
+function LoginPage({ isLoading, renderLoading, toggleAuthStatus, setAuthUser }) {
   const navigate = useNavigate();
 
   // Email
@@ -52,10 +53,11 @@ function LoginPage({ toggleAuthStatus, setAuthUser }) {
     }
 
     // TODO: remote logic
-    setAuthUser(1);
-
-    toggleAuthStatus();
-    navigate(homeRoute);
+    renderLoading(() => {
+      setAuthUser(1);
+      toggleAuthStatus();
+      navigate(homeRoute);
+    }, 750);
   }
 
   function emailChangeHandlerWrapper(value) {
@@ -74,6 +76,7 @@ function LoginPage({ toggleAuthStatus, setAuthUser }) {
 
   return (
     <>
+      {isLoading && <Loading />}
       <Header />
       <div className="note-auth__wrapper">
         <div className="note-auth__header">
@@ -103,7 +106,9 @@ function LoginPage({ toggleAuthStatus, setAuthUser }) {
 }
 
 LoginPage.propTypes = {
+  isLoading: PropTypes.bool.isRequired,
   setAuthUser: PropTypes.func.isRequired,
+  renderLoading: PropTypes.func.isRequired,
   toggleAuthStatus: PropTypes.func.isRequired,
 }
 

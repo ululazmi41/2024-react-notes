@@ -182,8 +182,18 @@ function App() {
         <DarkmodeProvider value={{ isDarkmode, toggleDarkmode }}>
           <LanguageProvider value={{ language, toggleLanguage }}>
             <Routes>
-              <Route path={loginRoute} element={<LoginPage toggleAuthStatus={toggleAuthStatus} setAuthUser={setAuthUser} />} />
-              <Route path={registerRoute} element={<RegisterPage />} />
+              <Route path={loginRoute} element={(
+                <LoginPage
+                  isLoading={isLoading}
+                  renderLoading={renderLoading}
+                  toggleAuthStatus={toggleAuthStatus}
+                  setAuthUser={setAuthUser} />
+              )} />
+              <Route path={registerRoute} element={(
+                <RegisterPage
+                  isLoading={isLoading}
+                  renderLoading={renderLoading} />
+              )} />
               <Route path="*" element={<GotoLogin />} />
             </Routes>
           </LanguageProvider>
@@ -206,7 +216,7 @@ function App() {
                   showing={showing}
                   setNotes={setNotes}
                   onDelete={handleDelete}
-                  renderLoading={renderLoading}
+                  parentRenderLoading={renderLoading}
                   homeNavigateTo={homeNavigateTo}
                 />} />
               <Route path={`${notesRoute}/:id`} element={

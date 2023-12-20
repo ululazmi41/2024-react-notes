@@ -24,7 +24,7 @@ import toast from 'react-hot-toast';
 import localization from '../consts/i10n'; 
 import LanguageContext from '../contexts/languageContext';
 
-function Home({ notes, showing, onDelete, homeNavigateTo, setNotes }) {
+function Home({ notes, showing, onDelete, homeNavigateTo, setNotes, parentRenderLoading }) {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -167,7 +167,7 @@ function Home({ notes, showing, onDelete, homeNavigateTo, setNotes }) {
 
   return (
     <>
-      <Header />
+      <Header renderLoading={parentRenderLoading} />
       <main className="note-app__body">
         <button className="notes-app__body__button-add" onClick={() => navigate("notes/new")}>{add}</button>
         <div className="note-app__body__actions">
@@ -198,6 +198,7 @@ Home.propTypes = {
   onDelete: PropTypes.func.isRequired,
   homeNavigateTo: PropTypes.func.isRequired,
   setNotes: PropTypes.func.isRequired,
+  parentRenderLoading: PropTypes.func.isRequired,
 }
 
 export default Home;

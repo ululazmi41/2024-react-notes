@@ -10,10 +10,12 @@ import DarkmodeContext from '../contexts/themecontext';
 import AuthContext from '../contexts/authContext';
 import LanguageContext from '../contexts/languageContext';
 
+import PropTypes from 'prop-types';
+
 // Localization
 import localization from '../consts/i10n';
 
-function Header() {
+function Header({ renderLoading }) {
   const navigate = useNavigate();
   const { language, toggleLanguage } = useContext(LanguageContext);
   const { isLoggedIn, toggleAuthStatus } = useContext(AuthContext);
@@ -21,10 +23,12 @@ function Header() {
   const { logout, darktheme, lighttheme } = localization[language];
 
   function handeLogout() {
-    // clear session
+    // TODO: clear session
 
-    toggleAuthStatus(false);
-    navigate(loginRoute);
+    renderLoading(() => {
+      toggleAuthStatus(false);
+      navigate(loginRoute);
+    }, 750);
   }
 
   return (
@@ -44,6 +48,10 @@ function Header() {
       </div>
     </header>
   )
+}
+
+Header.propTypes = {
+  renderLoading: PropTypes.func.isRequired,
 }
 
 export default Header;

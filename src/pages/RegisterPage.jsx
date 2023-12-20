@@ -6,22 +6,25 @@ import { Link, useNavigate } from 'react-router-dom';
 import { validateEmail } from '../helpers/validateEmai';
 import { validatePassword } from '../helpers/validatePassword';
 
+import PropTypes from 'prop-types';
+
 // Localization
 import localization from '../consts/i10n';
 import LanguageContext from '../contexts/languageContext';
 import { toTitleCase } from '../helpers/helpers';
+import Loading from '../components/Loading';
 
-function RegisterPage() {
+function RegisterPage({ isLoading, renderLoading }) {
   const navigate = useNavigate();
-  
+
   // Email
   const [email, emailChangeHandler] = useInput('');
   const [isEmailInvalid, setIsEmailInvalid] = useState(false);
-  
+
   // Password
   const [password, passwordChangeHandler] = useInput('');
   const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
-  
+
   // Confirm Password
   const [confirmPassword, confirmPasswordChangeHandler] = useInput('');
   const [isConfirmPasswordInvalid, setIsConfirmPasswordInvalid] = useState(false);
@@ -55,7 +58,9 @@ function RegisterPage() {
     }
 
     // TODO: remote logic
-    navigate(loginRoute);
+    renderLoading(() => {
+      navigate(loginRoute);
+    }, 750);
   }
 
   function emailChangeHandlerWrapper(value) {
@@ -81,13 +86,14 @@ function RegisterPage() {
 
   return (
     <>
-    <Header />
-    <div className="note-auth__wrapper">
-      <div className="note-auth__header">
-        <h2>{toTitleCase(register)}</h2>
-      </div>
-      <main className="note-auth__body">
-        <form className="grid" onSubmit={handleSubmit}>
+      {isLoading && <Loading />}
+      <Header />
+      <div className="note-auth__wrapper">
+        <div className="note-auth__header">
+          <h2>{toTitleCase(register)}</h2>
+        </div>
+        <main className="note-auth__body">
+          <form className="grid" onSubmit={handleSubmit}>
             <input
               type="text"
               className={"note-auth__input" + (isEmailInvalid && " text-red border-red placeholder-red")}
@@ -106,13 +112,18 @@ function RegisterPage() {
               defaultValue={confirmPassword}
               onChange={(e) => confirmPasswordChangeHandlerWrapper(e.target.value)}
               placeholder={confirmPasswordLocalization} />
-          <p className="auth-nav-description">{alreadyHaveAccount} <Link className="auth-nav" to={loginRoute}>{toTitleCase(login)}</Link></p>
-          <button className="notes-auth__button">{submit}</button>
-        </form>
-      </main>
-    </div>
+            <p className="auth-nav-description">{alreadyHaveAccount} <Link className="auth-nav" to={loginRoute}>{toTitleCase(login)}</Link></p>
+            <button className="notes-auth__button">{submit}</button>
+          </form>
+        </main>
+      </div>
     </>
   );
+}
+
+RegisterPage.propTypes = {
+  isLoading: PropTypes.bool.isRequired,
+  renderLoading: PropTypes.func.isRequired,
 }
 
 export default RegisterPage;
