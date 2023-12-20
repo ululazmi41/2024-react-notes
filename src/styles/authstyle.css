@@ -1,6 +1,8 @@
 :root {
   --title-color: #24B655;
   --button-color: #24B655;
+  --navigate-color: blue;
+  --navigate-color-hover: rgb(89, 89, 255);
   --button-hover-color: #46ce73;
 }
 
@@ -10,6 +12,7 @@
   --button-hover-color: #BBB;
   --title-color: white;
   --navigate-color: #BBB;
+  --navigate-color-hover: #DDD;
 }
 
 .auth-nav-description {
@@ -18,6 +21,11 @@
 
 .auth-nav {
   color: var(--navigate-color);
+  transition: all 0.3s ease-in-out;
+}
+
+.auth-nav:hover {
+  color: var(--navigate-color-hover);
 }
 
 .note-auth__wrapper {

@@ -16,14 +16,16 @@ import PageNotFound from './pages/PageNotFound';
 
 // Pages
 import HomePage from './pages/HomePage';
+import NotePage from './pages/NotePage';
 import LoginPage from './pages/LoginPage';
-import DetailPage from './pages/DetailPage';
 import RegisterPage from './pages/Registerpage';
 
 // Contexts
 import { AuthProvider } from './contexts/authContext';
 import { DarkmodeProvider } from './contexts/themecontext';
 import { LanguageProvider } from './contexts/languageContext';
+import { LoadingProvider } from './contexts/loadingContext';
+import { getAccessToken, getUserLogged } from './utils/network-data';
 
 function GotoLogin() {
   const navigate = useNavigate();
@@ -45,15 +47,18 @@ function App() {
   const [showing, setShowing] = useState('notes');
 
   // Booleans
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isDarkmode, setDarkmode] = useState(false); // TOOD: refactor
   const [language, setLanguage] = useState('en');
   const [initialized, setInitialized] = useState(false);
+  const [userInitialized, setuserInitialized] = useState(false);
 
   useEffect(() => {
     const localTheme = JSON.parse(localStorage.getItem('darkmode')) || false;
     const localLanguage = JSON.parse(localStorage.getItem('lang')) || 'en';
+
+    initUser();
 
     // Init Theme
     document.documentElement.setAttribute('data-theme', localTheme);
@@ -68,6 +73,24 @@ function App() {
     // Set initialized
     setInitialized(true);
   }, []);
+
+  async function initUser() {
+    const accessToken = getAccessToken();
+
+    // Init user
+    if (accessToken !== '') {
+      const { error, data: user } = await getUserLogged();
+
+      if (!error) {
+        if (user) {
+          setIsLoggedIn(true);
+          setAuthUser(user);
+        }
+      }
+    }
+
+    setuserInitialized(true);
+  }
 
   function setDataTheme(isDarkmode) {
     if (isDarkmode) {
@@ -98,62 +121,25 @@ function App() {
     });
   }
 
-  function toggleAuthStatus(value = null) {
-    setIsLoggedIn((prevState) => {
-      if (value) {
-        if (value === false) {
-          setAuthUser(null);
-        }
-        return value;
-      }
-
-      if (!prevState === false) {
-        setAuthUser(null);
-      }
-      return !prevState;
-    })
+  function toggleAuthStatus() {
+    const accessToken = getAccessToken();
+    if (accessToken === '') {
+      setAuthUser(null);
+      setIsLoggedIn(false);
+    } else {
+      setIsLoggedIn(true);
+    }
   }
 
   function renderLoading(func, ms) {
-    setIsLoading(true);
+    setLoading(true);
     setTimeout(() => {
-      setIsLoading(false);
+      setLoading(false);
 
       if (func) {
         func();
       }
     }, ms ? ms : 750);
-  }
-
-  function handleSubmit(title, content) {
-    const newNote = {
-      id: +new Date(),
-      title: title,
-      body: content,
-      createdAt: +new Date(),
-      archived: false,
-    };
-    setNotes((prevState) => {
-      return [
-        ...prevState,
-        newNote,
-      ];
-    });
-
-    toast.success(`New note added`);
-  }
-
-  function handleUpdate(note) {
-    const copyNotes = [...notes];
-    const noteIndex = copyNotes.findIndex((innerNote) => innerNote.id === note.id);
-    copyNotes[noteIndex] = note;
-
-    setNotes(copyNotes);
-    toast.success(`Note updated`, {
-      iconTheme: {
-        primary: '#5F8BCC',
-      },
-    });
   }
 
   function getNoteById(id) {
@@ -178,24 +164,34 @@ function App() {
 
   if (authUser === null) {
     return (
-      <div className={initialized ? '' : 'display-none'}>
+      <div className={initialized && userInitialized ? '' : 'display-none'}>
         <DarkmodeProvider value={{ isDarkmode, toggleDarkmode }}>
           <LanguageProvider value={{ language, toggleLanguage }}>
-            <Routes>
-              <Route path={loginRoute} element={(
-                <LoginPage
-                  isLoading={isLoading}
-                  renderLoading={renderLoading}
-                  toggleAuthStatus={toggleAuthStatus}
-                  setAuthUser={setAuthUser} />
-              )} />
-              <Route path={registerRoute} element={(
-                <RegisterPage
-                  isLoading={isLoading}
-                  renderLoading={renderLoading} />
-              )} />
-              <Route path="*" element={<GotoLogin />} />
-            </Routes>
+            <LoadingProvider value={{ isLoading, setLoading }}>
+              <AuthProvider value={{ isLoggedIn, toggleAuthStatus }}>
+                {isLoading && <Loading />}
+                <Toaster position="top-right" />
+                <Routes>
+                  <Route path={loginRoute} element={(
+                    <LoginPage
+                      isLoading={isLoading}
+                      renderLoading={renderLoading}
+                      toggleAuthStatus={toggleAuthStatus}
+                      setAuthUser={setAuthUser} />
+                  )} />
+                  <Route path={registerRoute} element={(
+                    <RegisterPage
+                      isLoading={isLoading}
+                      renderLoading={renderLoading} />
+                  )} />
+                  <Route path="*" element={(
+                    initialized && userInitialized
+                      ? <GotoLogin />
+                      : <></>
+                  )} />
+                </Routes>
+              </AuthProvider>
+            </LoadingProvider>
           </LanguageProvider>
         </DarkmodeProvider>
       </div>
@@ -203,35 +199,33 @@ function App() {
   }
 
   return (
-    <div className={initialized ? '' : 'display-none'}>
+    <div className={initialized && userInitialized ? '' : 'display-none'}>
       <DarkmodeProvider value={{ isDarkmode, toggleDarkmode }}>
         <LanguageProvider value={{ language, toggleLanguage }}>
           <AuthProvider value={{ isLoggedIn, toggleAuthStatus }}>
-            {isLoading && <Loading />}
-            <Toaster position="top-right" />
-            <Routes>
-              <Route path={homeRoute} element={
-                <HomePage
-                  notes={notes}
-                  showing={showing}
-                  setNotes={setNotes}
-                  onDelete={handleDelete}
-                  parentRenderLoading={renderLoading}
-                  homeNavigateTo={homeNavigateTo}
-                />} />
-              <Route path={`${notesRoute}/:id`} element={
-                <DetailPage
-                  isLoading={isLoading}
-                  getNoteById={getNoteById}
-                  handleSubmit={handleSubmit}
-                  handleUpdate={handleUpdate}
-                  renderLoading={renderLoading}
-                  homeNavigateTo={homeNavigateTo}
-                />} />
-              <Route path={loginRoute} element={<GotoHomePage />} />
-              <Route path={registerRoute} element={<GotoHomePage />} />
-              <Route path="*" element={<PageNotFound />} />
-            </Routes>
+            <LoadingProvider value={{ isLoading, setLoading }}>
+              {isLoading && <Loading />}
+              <Toaster position="top-right" />
+              <Routes>
+                <Route path={homeRoute} element={
+                  <HomePage
+                    showing={showing}
+                    setNotes={setNotes}
+                    onDelete={handleDelete}
+                    homeNavigateTo={homeNavigateTo}
+                  />} />
+                <Route path={`${notesRoute}/:id`} element={
+                  <NotePage
+                    isLoading={isLoading}
+                    getNoteById={getNoteById}
+                    renderLoading={renderLoading}
+                    homeNavigateTo={homeNavigateTo}
+                  />} />
+                <Route path={loginRoute} element={<GotoHomePage />} />
+                <Route path={registerRoute} element={<GotoHomePage />} />
+                <Route path="*" element={<PageNotFound />} />
+              </Routes>
+            </LoadingProvider>
           </AuthProvider>
         </LanguageProvider>
       </DarkmodeProvider>

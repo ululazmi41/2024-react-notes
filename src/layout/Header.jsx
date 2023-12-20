@@ -10,24 +10,28 @@ import DarkmodeContext from '../contexts/themecontext';
 import AuthContext from '../contexts/authContext';
 import LanguageContext from '../contexts/languageContext';
 
-import PropTypes from 'prop-types';
-
 // Localization
 import localization from '../consts/i10n';
+import { putAccessToken } from '../utils/network-data';
+import LoadingContext from '../contexts/loadingContext';
 
-function Header({ renderLoading }) {
+function Header() {
   const navigate = useNavigate();
   const { language, toggleLanguage } = useContext(LanguageContext);
   const { isLoggedIn, toggleAuthStatus } = useContext(AuthContext);
   const { isDarkmode, toggleDarkmode } = useContext(DarkmodeContext);
   const { logout, darktheme, lighttheme } = localization[language];
+  
+  // Loading
+  const { setLoading } = useContext(LoadingContext);
 
   function handeLogout() {
-    // TODO: clear session
-
-    renderLoading(() => {
-      toggleAuthStatus(false);
+    setLoading(true);
+    setTimeout(() => {
+      putAccessToken('');
+      toggleAuthStatus();
       navigate(loginRoute);
+      setLoading(false);
     }, 750);
   }
 
@@ -48,10 +52,6 @@ function Header({ renderLoading }) {
       </div>
     </header>
   )
-}
-
-Header.propTypes = {
-  renderLoading: PropTypes.func.isRequired,
 }
 
 export default Header;

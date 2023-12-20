@@ -25,8 +25,11 @@ const CHARSLENGTH = 50;
 
 // Helpers
 import { toTitleCase } from '../helpers/helpers';
+import toast from 'react-hot-toast';
+import { addNote, deleteNote, getNote } from '../utils/network-data';
+import LoadingContext from '../contexts/loadingContext';
 
-function DetailPage({ getNoteById, isLoading, renderLoading, handleUpdate, homeNavigateTo, handleSubmit }) {
+function DetailPage({ isLoading, homeNavigateTo }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const [state, setState] = useState('new'); // new || update
@@ -34,6 +37,7 @@ function DetailPage({ getNoteById, isLoading, renderLoading, handleUpdate, homeN
   const [isNoteExist, setIsNoteExist] = useState(true);
   const [isDateUpdated, setIsDateUpdated] = useState(false);
   const [isContentEdited, setIsContentEdited] = useState(false);
+  const [initialized, setInitialized] = useState(false);
   const [note, setNote] = useState({
     id: -1,
     title: '',
@@ -44,32 +48,43 @@ function DetailPage({ getNoteById, isLoading, renderLoading, handleUpdate, homeN
 
   // Localization
   const { language } = useContext(LanguageContext);
-  const { archived, submitNote, updateNote } = localization[language];
+  const { archived, submitNote, updateNote: updateNoteLocalization } = localization[language];
+
+  // Loading
+  const { setLoading } = useContext(LoadingContext);
 
   useEffect(() => {
-    const index = parseInt(id);
-    const note = getNoteById(index);
+    handleNote();
+  }, []);
+
+  async function handleNote() {
+    if (id === 'new') {
+      setInitialized(true);
+      return;
+    }
+
+    const { error, data: note } = await getNote(id);
+
+    if (error) {
+      console.error(`Error when trying to get note with id of ${id}`);
+      setIsNoteExist(false);
+      setInitialized(true);
+      return;
+    }
 
     if (note === null || note === undefined) {
-      if (id !== 'new') {
-        setIsNoteExist(false);
-      }
+      setIsNoteExist(false);
     } else {
-      const parsedNote = {
-        id: note.id,
-        title: note.title,
-        body: note.body,
-        createdAt: note.createdAt,
-        archived: note.archived,
-      };
-      setNote(parsedNote);
+      setNote(note);
       setState('update');
       setIsDateUpdated(false);
 
-      renderNote(parsedNote);
+      renderNote(note);
       renderTagArchive(note);
     }
-  }, []);
+
+    setInitialized(true);
+  }
 
   function renderNote(note) {
     const {
@@ -96,17 +111,37 @@ function DetailPage({ getNoteById, isLoading, renderLoading, handleUpdate, homeN
     }
   }
 
-  function onSubmit(event) {
+  async function onSubmit(event) {
     event.preventDefault();
-    renderLoading(() => {
-      if (state === 'new') {
-        handleSubmit(note.title, note.body);
-      } else if (state === 'update') {
-        handleUpdate(note);
+    setLoading(true);
+
+    if (state === 'new') {
+      const { error, data } = await addNote({ title: note.title, body: note.body });
+      if (error || !data) return;
+      toast.success(`New note added`);
+    } else if (state === 'update') {
+      const { error: errorDelete } = await deleteNote(note.id);
+      
+      if (errorDelete) {
+        console.error(`Error when deleting existing note with id: ${note.id}`);
       }
-      navigate('/');
-      homeNavigateTo('notes');
-    }, 750);
+
+      const { error: errorAdd, data } = await addNote({ title: note.title, body: note.body });
+      
+      if (errorAdd || !data) {
+          console.error(`Error when adding note with title: ${note.title}`);
+      }
+      
+      toast.success(`Note updated`, {
+        iconTheme: {
+          primary: '#5F8BCC',
+        },
+      });
+    }
+    navigate('/');
+    homeNavigateTo('notes');
+
+    setLoading(false);
   }
 
   function updateDate() {
@@ -184,7 +219,7 @@ function DetailPage({ getNoteById, isLoading, renderLoading, handleUpdate, homeN
     const moreThanTen = charsLeft > 0;
 
     if (stillEmpty) {
-      return <p className='note-input__title__char-limit tw-text-transparent'>placeholder</p>;
+      return <p className='note-input__title__char-limit tw-text-transparent'>&nbsp;</p>;
     } else if (twentiesAndBelow) {
       return <p className='note-input__title__char-limit tw-text-brown'>{charsLeft}</p>
     } else if (moreThanTen) {
@@ -194,59 +229,55 @@ function DetailPage({ getNoteById, isLoading, renderLoading, handleUpdate, homeN
     }
   }
 
-  if (!isNoteExist) {
+  if (!isNoteExist && initialized) {
     return <PageNotFound />
   }
 
   return (
-    <>
+    <div className={initialized ? "" : "display-none"}>
       {isLoading && <Loading />}
       <Header />
-      <form className='note-input' onSubmit={onSubmit}>
+      <form className="note-input" onSubmit={onSubmit}>
         {renderCharsLeft()}
         <input
           id="judul"
           type="text"
           name="judul"
-          placeholder='Judul'
+          placeholder="Judul"
           value={note.title}
-          className={note.archived ? 'note-input__title tw-cursor-default' : 'note-input__title'}
+          className={note.archived ? "note-input__title tw-cursor-default" : "note-input__title"}
           onChange={onTitleChangeHandler}
           readOnly={note.archived}
           required
         />
         <div className="note-input__date-wrapper">
-          <p id="tanggal" className='note-input__date'>{showFormattedDate(note.createdAt, language)}</p>
-          <div className='tag'>{toTitleCase(archived)}</div>
+          <p id="tanggal" className="note-input__date">{showFormattedDate(note.createdAt, language)}</p>
+          <div className="tag">{toTitleCase(archived)}</div>
         </div>
         <textarea
           id="isi"
           type="text"
           name="isi"
           value={note.body}
-          className={note.archived ? 'note-input__body tw-cursor-default' : 'note-input__body'}
-          placeholder='Catatan'
+          className={note.archived ? "note-input__body tw-cursor-default" : "note-input__body"}
+          placeholder="Catatan"
           onChange={onBodyChangeHandler}
           readOnly={note.archived}
           required
         />
         {isContentEdited && (
-          state === 'new'
+          state === "new"
             ? <button type="submit">{submitNote}</button>
-            : <button type="submit">{updateNote}</button>
+            : <button type="submit">{updateNoteLocalization}</button>
         )}
       </form>
-    </>
+    </div>
   );
 }
 
 DetailPage.propTypes = {
-  getNoteById: PropTypes.func.isRequired,
   isLoading: PropTypes.bool.isRequired,
-  renderLoading: PropTypes.func.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
   homeNavigateTo: PropTypes.func.isRequired,
-  handleSubmit: PropTypes.func.isRequired,
 }
 
 export default DetailPage;

@@ -21,20 +21,22 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 // Localization
-import localization from '../consts/i10n'; 
+import localization from '../consts/i10n';
 import LanguageContext from '../contexts/languageContext';
+import { archiveNote, deleteNote, getActiveNotes, getArchivedNotes, unarchiveNote } from '../utils/network-data';
 
-function Home({ notes, showing, onDelete, homeNavigateTo, setNotes, parentRenderLoading }) {
+function Home({ showing, homeNavigateTo }) {
   const navigate = useNavigate();
+  const [notes, setHomeNotes] = useState([]);
+  const [archives, setHomeArchives] = useState([]);
   const [search, setSearch] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [loadingTimeout, setLoadingTimeout] = useState(null);
 
   // Localization
   const { language } = useContext(LanguageContext);
-  const { add, notes: notesLocalization, archives } = localization[language];
+  const { add, notes: notesLocalization, archives: archivesLocalization } = localization[language];
 
   function handleSearch(keyword) {
     if (keyword === null || keyword === undefined || keyword === '') {
@@ -48,9 +50,19 @@ function Home({ notes, showing, onDelete, homeNavigateTo, setNotes, parentRender
 
   useEffect(() => {
     const keyword = searchParams.get('q');
+
+    async function initRemoteNotes() {
+      await handleRemoteActives();
+      await handleRemoteArchives();
+      setLoading(false);
+      setInitialized(true);
+    }
+
+    initRemoteNotes();
+
     handleSearch(keyword);
     renderNavigationButton(showing);
-    setInitialized(true);
+    // setInitialized(true);
   }, []);
 
   function renderNavigationButton(page) {
@@ -68,50 +80,104 @@ function Home({ notes, showing, onDelete, homeNavigateTo, setNotes, parentRender
     }
   }
 
-  function handleDelete(id) {
-    renderLoading(400, () => {
-      onDelete(id);
-    });
-  }
+  async function handleDelete(id) {
+    setLoading(true);
+    const { error } = await deleteNote(id);
 
-  function onToggleArchive(id) {
-    renderLoading(400, () => {
-      const copy = notes.slice();
-      const index = copy.findIndex((note) => note.id === id);
-      copy[index].archived = !copy[index].archived;
-      if (copy[index].archived) {
-        toast.success('note archived', {
-          iconTheme: {
-            primary: '#AC611B',
-          },
-        });
-      } else {
-        toast.success('note restored', {
-          iconTheme: {
-            primary: '#AC611B',
-          },
-        });
-      }
-
-      setNotes(copy);
-    });
-  }
-
-  function renderLoading(ms, fun) {
-    const timeout = setTimeout(() => {
-      setIsLoading(false);
-
-      if (fun) {
-        fun();
-      }
-    }, ms);
-    
-    if (loadingTimeout != null) {
-      clearTimeout(loadingTimeout);
+    if (error) {
+      console.error(`failed to delete note with id: ${id}`);
+      return;
     }
 
-    setIsLoading(true);
-    setLoadingTimeout(timeout)
+    toast.success(`Note deleted`, {
+      iconTheme: {
+        primary: '#D83636',
+      },
+    });
+
+    // Reset
+    handleRemoteActives();
+    handleRemoteArchives();
+
+    setLoading(false);
+  }
+
+  async function handleArchive(id) {
+    setLoading(true);
+    const { error } = await archiveNote(id);
+
+    if (error) {
+      console.error(`failed to archive note with id: ${id}`);
+      return;
+    }
+
+    toast.success('note archived', {
+      iconTheme: {
+        primary: '#AC611B',
+      },
+    });
+
+    // Reset
+    handleRemoteActives();
+    handleRemoteArchives();
+
+    setLoading(false);
+  }
+
+  async function handleUnarchive(id) {
+    setLoading(true);
+    const { error } = await unarchiveNote(id);
+
+    if (error) {
+      console.error(`failed to unarchive note with id: ${id}`);
+      return;
+    }
+
+    toast.success('note restored', {
+      iconTheme: {
+        primary: '#AC611B',
+      },
+    });
+
+    // Reset
+    handleRemoteActives();
+    handleRemoteArchives();
+
+    setLoading(false);
+  }
+
+  async function handleRemoteActives() {
+    let { error, data: notes } = await getActiveNotes();
+
+    if (error) {
+      return;
+    }
+
+    setHomeNotes(notes);
+  }
+
+  async function handleRemoteArchives() {
+    let { error, data: notes } = await getArchivedNotes();
+
+    if (error) {
+      return;
+    }
+
+    setHomeArchives(notes);
+  }
+
+  function filterNotes(notes) {
+    const filteredNotes = notes.filter((note) => {
+      const isIncludingTitle = note.title.toLowerCase().includes(search);
+      const isIncludingDate = showFormattedDate(note.createdAt, language).toLowerCase().includes(search);
+      const isIncludingBody = note.body.toLowerCase().includes(search);
+      if (isIncludingTitle || isIncludingDate || isIncludingBody) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+    return filteredNotes;
   }
 
   function showPage(page) {
@@ -119,71 +185,44 @@ function Home({ notes, showing, onDelete, homeNavigateTo, setNotes, parentRender
     homeNavigateTo(page);
   }
 
-  function handleNotes(notesParams) {
-    let notes = [];
-    let archives = [];
-
-    if (search === '') {
-      notes = notesParams.filter((note) => note.archived === false);
-      archives = notesParams.filter((note) => note.archived === true);
-    } else {
-      const tempNotes = notesParams.filter((note) => note.archived === false);
-      notes = tempNotes.filter((note) => {
-        const isIncludingTitle = note.title.toLowerCase().includes(search);
-        const isIncludingDate = showFormattedDate(note.createdAt).toLowerCase().includes(search);
-        const isIncludingBody = note.body.toLowerCase().includes(search);
-
-        if (isIncludingTitle || isIncludingDate || isIncludingBody) {
-          return true;
-        } else {
-          return false;
-        }
-      })
-
-      const tempArchives = notesParams.filter((note) => note.archived === true);
-      archives = tempArchives.filter((note) => {
-        const isIncludingTitle = note.title.toLowerCase().includes(search);
-        const isIncludingDate = showFormattedDate(note.createdAt).toLowerCase().includes(search);
-        const isIncludingBody = note.body.toLowerCase().includes(search);
-
-        if (isIncludingTitle || isIncludingDate || isIncludingBody) {
-          return true;
-        } else {
-          return false;
-        }
-      })
-    }
-
+  function handleNotes() {
     if (showing === 'notes') {
-      return notes;
+      return filterNotes(notes);
     } else if (showing === 'archives') {
-      return archives;
+      return filterNotes(archives);
     } else {
+      console.warning(`Unknown showing type: ${showing}, returning empty note`);
       return [];
     }
   }
-
-  const filteredNotes = handleNotes(notes);
+  const filteredNotes = handleNotes();
 
   return (
     <>
-      <Header renderLoading={parentRenderLoading} />
+      <Header />
       <main className="note-app__body">
         <button className="notes-app__body__button-add" onClick={() => navigate("notes/new")}>{add}</button>
         <div className="note-app__body__actions">
           <div className="note-app__body__buttons">
             <button id="notes" onClick={() => showPage("notes")} className="">{notesLocalization}</button>
-            <button id="archives" onClick={() => showPage("archives")} className="">{archives}</button>
+            <button id="archives" onClick={() => showPage("archives")} className="">{archivesLocalization}</button>
           </div>
           <Search value={search} onChange={(event) => handleSearch(event.target.value)} />
         </div>
         <div className="relative">
           {isLoading && <Loading />}
+          {!initialized && <NoteList
+            notes={[]}
+            onDelete={() => {}}
+            handleArchive={() => {}}
+            handleUnarchive={() => {}}
+          />}
           {initialized && (filteredNotes.length > 0
             ? <NoteList
               notes={filteredNotes}
               onDelete={handleDelete}
-              onToggleArchive={onToggleArchive}
+              handleArchive={handleArchive}
+              handleUnarchive={handleUnarchive}
             />
             : <NoteEmpty />)}
         </div>
@@ -193,12 +232,8 @@ function Home({ notes, showing, onDelete, homeNavigateTo, setNotes, parentRender
 }
 
 Home.propTypes = {
-  notes: PropTypes.array.isRequired,
   showing: PropTypes.string.isRequired,
-  onDelete: PropTypes.func.isRequired,
   homeNavigateTo: PropTypes.func.isRequired,
-  setNotes: PropTypes.func.isRequired,
-  parentRenderLoading: PropTypes.func.isRequired,
 }
 
 export default Home;

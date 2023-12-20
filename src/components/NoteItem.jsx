@@ -17,7 +17,7 @@ function handleNoteItemOnKeyDown(e, id, navigate) {
   }
 }
 
-function NoteItem({ id, title, date, body, archived, onDelete, onToggleArchive }) {
+function NoteItem({ id, title, date, body, archived, onDelete, handleArchive, handleUnarchive }) {
   const navigate = useNavigate();
 
   return (
@@ -33,12 +33,12 @@ function NoteItem({ id, title, date, body, archived, onDelete, onToggleArchive }
         </button>
         {archived
           ? (
-            <button className="note-item__unarchive-button" onClick={() => onToggleArchive(id)}>
+            <button className="note-item__unarchive-button" onClick={() => handleUnarchive(id)}>
               <MdUnarchive size={22} />
             </button>
           )
           : (
-            <button className="note-item__archive-button" onClick={() => onToggleArchive(id)}>
+            <button className="note-item__archive-button" onClick={() => handleArchive(id)}>
               <MdArchive size={22} />
             </button>
           )
@@ -49,13 +49,14 @@ function NoteItem({ id, title, date, body, archived, onDelete, onToggleArchive }
 }
 
 NoteItem.propTypes = {
-  id: PropTypes.number.isRequired,
+  id: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   date: PropTypes.string.isRequired,
   body: PropTypes.string.isRequired,
   archived: PropTypes.bool.isRequired,
   onDelete: PropTypes.func.isRequired,
-  onToggleArchive: PropTypes.func.isRequired,
+  handleArchive: PropTypes.func.isRequired,
+  handleUnarchive: PropTypes.func.isRequired,
 }
 
 export default NoteItem;

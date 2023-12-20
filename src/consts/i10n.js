@@ -8,10 +8,11 @@ const localization = {
     logout: 'logout',
     dontHaveAccount: 'Dont\'t have an account?',
     alreadyHaveAccount: 'Already have an account?',
-    emailAddress: 'E-mail address',
-    confirmPassword: 'Confirm password',
+    emailPlaceholder: 'E-mail address',
+    ConfirmPasswordPlaceholder: 'Confirm password',
     register: 'Register',
     submit: 'Submit',
+    namePlaceholder: 'Name',
     
     // Home Page
     add: 'Add',
@@ -38,10 +39,11 @@ const localization = {
     login: 'masuk',
     dontHaveAccount: 'Belum memiliki akun?',
     alreadyHaveAccount: 'Sudah memiliki akun?',
-    emailAddress: 'Alamat email',
-    confirmPassword: 'Konfirmasi password',
+    emailPlaceholder: 'Alamat email',
+    ConfirmPasswordPlaceholder: 'Konfirmasi password',
     register: 'Daftar',
     submit: 'Kirim',
+    namePlaceholder: 'Nama',
 
     // Home Page Buttons
     add: 'Tambah',

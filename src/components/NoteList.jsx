@@ -12,20 +12,21 @@ import NoteItem from './NoteItem';
 // Localization
 import LanguageContext from '../contexts/languageContext';
 
-function NotesList({ notes, onDelete, onToggleArchive }) {
+function NotesList({ notes, onDelete, handleArchive, handleUnarchive }) {
   const { language } = useContext(LanguageContext);
   return (
     <div className="notes-list">
       {notes.map((note) => (
         <NoteItem
           id={note.id}
-          key={note.title}
+          key={note.id}
           title={note.title}
           date={showFormattedDate(note.createdAt, language)}
           body={note.body}
           archived={note.archived}
           onDelete={onDelete}
-          onToggleArchive={onToggleArchive}
+          handleArchive={handleArchive}
+          handleUnarchive={handleUnarchive}
         />
       ))}
     </div>
@@ -35,7 +36,8 @@ function NotesList({ notes, onDelete, onToggleArchive }) {
 NotesList.propTypes = {
   notes: PropTypes.array.isRequired,
   onDelete: PropTypes.func.isRequired,
-  onToggleArchive: PropTypes.func.isRequired,
+  handleArchive: PropTypes.func.isRequired,
+  handleUnarchive: PropTypes.func.isRequired,
 }
 
 export default NotesList;

@@ -14,13 +14,7 @@ function PageNotFound() {
   return (
     <>
       <Header />
-      <div style={{
-        width: 'max-content',
-        alignContent: 'center',
-        height: '70vh',
-        display: 'grid',
-        margin: 'auto',
-      }}>
+      <div className="page-not-found__wrapper">
         <h2 style={{
           fontSize: '4em',
           textAlign: 'center',
@@ -33,9 +27,7 @@ function PageNotFound() {
           marginBottom: '0.6em',
         }}>Page not Found</p>
         <p>{pageNotExistGoto}</p>
-        <p style={{
-          textAlign: 'center',
-        }}><Link to={homeRoute}>{homePage}</Link></p>
+        <Link className='page-not-found__nav' to={homeRoute}>{homePage}</Link>
       </div>
     </>
   )
