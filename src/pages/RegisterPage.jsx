@@ -97,7 +97,7 @@ function RegisterPage() {
               defaultValue={confirmPassword}
               onChange={(e) => confirmPasswordChangeHandlerWrapper(e.target.value)}
               placeholder="confirm password ..." />
-          <p className="text-11pt">Already have an account? <Link to={loginRoute}>Login</Link></p>
+          <p className="auth-nav-description">Already have an account? <Link className="auth-nav" to={loginRoute}>Login</Link></p>
           <button className="notes-auth__button">Submit</button>
         </form>
       </main>

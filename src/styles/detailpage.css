@@ -1,3 +1,14 @@
+:root {
+  --button: #24B655;
+  --button-hover: #37bd63;
+}
+
+[data-theme='dark'] {
+  --font-color: white;
+  --button: #666;
+  --button-hover: #777;
+}
+
 .note-input {
   margin: 0 auto; 
   padding: 34px 0 0;
@@ -26,6 +37,7 @@
   font-size: 14pt;
   margin: 4px 0 0;
   padding: 0;
+  color: var(--font-color);
 }
 
 .note-input__title__char-limit {
@@ -72,23 +84,18 @@
   margin: 0;
   padding: 0;
   min-height: 400px;
+  color: var(--font-color);
 }
 
 .note-input__body::placeholder {
   font-size: 12pt;
 }
 
-input::placeholder,
-textarea::placeholder {
-  color: #666;
-  font-weight: bold;
-}
-
 .note-input button {
   width: 100px;
   padding: 8px;
   display: block;
-  background-color: #24B655;
+  background-color: var(--button);
   
   border: 1px solid #aaa;
   border-radius: 4px;
@@ -100,7 +107,7 @@ textarea::placeholder {
 }
 
 .note-input button:hover {
-  background-color: #37bd63;
+  background-color: var(--button-hover);
 }
 
 @media only screen and (min-width: 800px) {

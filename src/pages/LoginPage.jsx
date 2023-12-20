@@ -84,7 +84,7 @@ function LoginPage({ toggleAuthStatus, setAuthUser }) {
             defaultValue={password}
             onChange={(e) => passwordChangeHandlerWrapper(e.target.value)}
             placeholder="password ..." />
-            <p className="text-11pt">Dont`t have an account? <Link to={registerRoute}>Register</Link></p>
+            <p className="auth-nav-description">Dont`t have an account? <Link className="auth-nav" to={registerRoute}>Register</Link></p>
             <button className="notes-auth__button">Submit</button>
           </form>
         </main>

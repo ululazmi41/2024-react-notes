@@ -6,6 +6,18 @@
   display: grid;
 }
 
+.flex {
+  display: flex;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.w-1000px {
+  width: 1000px;
+}
+
 .text-red {
   color: red;
 }

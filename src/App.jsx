@@ -31,28 +31,45 @@ function GotoLogin() {
   return (<></>);
 }
 
+function GotoHomePage() {
+  const navigate = useNavigate();
+  useEffect(() => navigate(homeRoute), []);
+
+  return (<></>);
+}
+
 function App() {
   const [notes, setNotes] = useState(() => getInitialData());
   const [authUser, setAuthUser] = useState(1);
   const [showing, setShowing] = useState('notes');
-  
+
   // Booleans
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isDarkmode, setDarkmode] = useState(false);
 
-  function toggleDarkmode() {
-    setDarkmode((prevState) => {
-      localStorage.setItem('darkmode', JSON.stringify(!prevState));
-      return !prevState;
-    });
+  function setDataTheme(isDarkmode) {
+    if (isDarkmode) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
   }
 
   useEffect(() => {
     const localTheme = JSON.parse(localStorage.getItem('darkmode')) || false;
-    console.log(localTheme, isDarkmode);
+    document.documentElement.setAttribute('data-theme', localTheme);
+    setDataTheme(localTheme);
     setDarkmode(localTheme);
   }, []);
+
+  function toggleDarkmode() {
+    setDarkmode((prevState) => {
+      localStorage.setItem('darkmode', JSON.stringify(!prevState));
+      setDataTheme(!prevState);
+      return !prevState;
+    });
+  }
 
   function toggleAuthStatus(value = null) {
     setIsLoggedIn((prevState) => {
@@ -168,8 +185,8 @@ function App() {
               renderLoading={renderLoading}
               homeNavigateTo={homeNavigateTo}
             />} />
-          <Route path="/login" element={<LoginPage setAuthUser={setAuthUser} toggleAuthStatus={toggleAuthStatus} />} />
-          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<GotoHomePage />} />
+          <Route path="/register" element={<GotoHomePage />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </AuthProvider>

@@ -1,4 +1,9 @@
+[data-theme='dark'] {
+  --font-color: white;
+}
+
 .theme-toggler {
+  color: var(--font-color);
   margin-left: 1em;
   background: none;
   border: none;

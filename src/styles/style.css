@@ -1,15 +1,60 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
 
+:root {
+  --loading: #666;
+  --loading-background: rgba(255, 255, 255, 0.4);
+  --add-button: #24B655;
+  --logout-color: #666;
+  --background-color: #eee;
+  --note-card-delete-color: #ff5f52;
+  --note-card-delete-color-hover: #b00020;
+  --note-card-archive-color: #22c74b;
+  --note-card-archive-color-hover: #17da47;
+  --note-card-unarchive-color: #c78522;
+  --note-card-unarchive-color-hover: #daad17;
+  --active-navigation: #24B655;
+  --active-navigation-color: white;
+  --inactive-navigation-button: #BBB;
+  --active-navigation-hover: #30c461;
+  --inactive-navigation: #666;
+  --inactive-navigation-button-hover: #CCC;
+}
+
+[data-theme='dark'] {
+  --loading: white;
+  --loading-background: #222;
+  --brand-color: #DDD;
+  --font-color: white;
+  --logout-color: white;
+  --input-placeholer: white;
+  --background-color: #222;
+  --add-button: #666;
+  --add-button-hover: #777;
+  --placeholder-color: white;
+  --note-card-delete-color: #ccc;
+  --note-card-delete-color-hover: #888;
+  --note-card-archive-color: #ccc;
+  --note-card-archive-color-hover: #888;
+  --note-card-unarchive-color: #ccc;
+  --note-card-unarchive-color-hover: #888;
+  --active-navigation: #666;
+  --active-navigation-hover: #888;
+  --inactive-navigation: white;
+  --inactive-navigation-button: #333;
+  --inactive-navigation-button-hover: #444;
+}
+
 * {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
   font-family: 'Inter';
+  transition: background 0.3s ease-in;
 }
 
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #ffffff;
+  background-color: var(--background-color);
   /* background-color: #202124; */
   /* color: white; */
 }
@@ -20,22 +65,30 @@ textarea {
   margin: 12px 0;
   font-family: 'Inter', sans-serif;
   background-color: transparent;
-  /* color: white; */
+  color: var(--font-color);
   border: 1px solid #aaa;
   border-radius: 4px;
 }
 
-.note-app__header {
-  display: flex;
-  
-  margin: auto;
-  max-width: 1000px;
-  justify-content: space-between;
+input::placeholder,
+textarea::placeholder {
+  font-weight: bold;
+  color: var(--placeholder-color);
+}
 
+.note-app__header {
+  border-bottom: 1px solid #aaa;
+}
+
+.note-app__heaader__wrapper {
+  display: flex;
+  width: 1000px;
+  height: 100%;
   height: 3.4em;
   padding: 4px 16px;
+  margin: auto;
+  justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #aaa;
 }
 
 .note-app__header h1 {
@@ -49,9 +102,7 @@ textarea {
 
 .note-app__header h1 {
   margin: 8px 0;
-  /* flex: 1; */
-  color: #24B655;
-  /* color: white; */
+  color: var(--brand-color);
 }
 
 .note-app__header__brand-wrapper {
@@ -89,13 +140,14 @@ textarea {
   border-style: solid;
 
   color: white;
-  border-color: #24B655;
-  background-color: #24B655;
+  border-color: var(--add-button);
+  background-color: var(--add-button);
+  transition: all 0.3s ease-in-out;
 }
 
 .notes-app__body__button-add:hover {
-  border-color: #46ce73;
-  background-color: #46ce73;
+  border-color: var(--add-button-hover);
+  background-color: var(--add-button-hover);
 }
 
 .note-app__body__buttons {
@@ -114,21 +166,25 @@ textarea {
 }
 
 .notes-app__button__idle {
-  color: #555;
-  background: #BBB;
+  color: var(--inactive-navigation);
+  background: var(--inactive-navigation-button);
+  border-color: var(--inactive-navigation-button);
+  transition: all 0.2s ease-in-out;
 }
 
 .notes-app__button__idle:hover {
-  background: #CCC;
+  background: var(--inactive-navigation-button-hover);
+  border-color: var(--inactive-navigation-button-hover);
 }
 
 .notes-app__button__selected {
-  color: white;
-  background: #24B655;
+  color: var(--active-navigation-color);
+  background: var(--active-navigation);
+  border-color: var(--active-navigation);
 }
 
 .notes-app__button__selected:hover {
-  background: #30c461;
+  background: var(--active-navigation-hover);
 }
 
 .notes-list {
@@ -147,8 +203,9 @@ textarea {
   position: absolute;
 
   width: 100%;
-  /* min-height: 500px; */
   height: 100%;
+  opacity: 40%;
+  background-color: var(--loading-background);
 
   gap: 8px;
   margin-bottom: 48px;
@@ -159,7 +216,7 @@ textarea {
 
 .notes-list__loading {
   margin: auto;
-  color: #666;
+  color: var(--loading);
 }
 
 .notes-list__empty-message {
@@ -184,9 +241,11 @@ textarea {
 
 .note-search input {
   margin: 0;
+  color: var(--input-placeholer);
 }
 
 .note-item {
+  color: var(--font-color);
   border: 1px solid #aaa;
   border-radius: 4px;
   overflow: hidden;
@@ -228,17 +287,18 @@ textarea {
 }
 
 .note-app__logout-button {
-  gap: 0.3em; 
+  gap: 0.3em;
   display: flex;
   align-items: center;
-  
+
   border: none;
   font-size: 12pt;
   cursor: pointer;
   background: none;
   transition: all 0.2s ease-in-out;
-  
+
   opacity: 60%;
+  color: var(--logout-color);
 }
 
 .note-app__logout-button:hover {
@@ -246,27 +306,37 @@ textarea {
 }
 
 .note-item__delete-button,
-.note-item__archive-button {
+.note-item__archive-button,
+.note-item__unarchive-button {
   border: none;
   background: none;
 
   cursor: pointer;
+  transition: all 0.3s ease-in-out;
 }
 
 .note-item__delete-button {
-  color: #ff5f52;
-}
-
-.note-item__archive-button {
-  color: #fff263;
-}
-
-.note-item__archive-button:hover {
-  color: #c49000;
+  color: var(--note-card-delete-color);
 }
 
 .note-item__delete-button:hover {
-  color: #b00020;
+  color: var(--note-card-delete-color-hover);
+}
+
+.note-item__archive-button {
+  color: var(--note-card-archive-color);
+}
+
+.note-item__archive-button:hover {
+  color: var(--note-card-archive-color-hover);
+}
+
+.note-item__unarchive-button {
+  color: var(--note-card-unarchive-color);
+}
+
+.note-item__unarchive-button:hover {
+  color: var(--note-card-unarchive-color-hover);
 }
 
 @media only screen and (min-width: 500px) {

@@ -5,8 +5,8 @@ import { createRoot } from 'react-dom/client';
 import './styles/style.css';
 import './styles/loading.css';
 import './styles/tailwind.css';
-import './styles/noteInput.css';
 import './styles/authstyle.css';
+import './styles/detailpage.css';
 import './styles/themetoggler.css';
 
 // Components

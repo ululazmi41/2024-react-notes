@@ -1,3 +1,25 @@
+:root {
+  --title-color: #24B655;
+  --button-color: #24B655;
+  --button-hover-color: #46ce73;
+}
+
+[data-theme='dark'] {
+  --auth-nav-color: white;
+  --button-color: #666;
+  --button-hover-color: #BBB;
+  --title-color: white;
+  --navigate-color: #BBB;
+}
+
+.auth-nav-description {
+  color: var(--auth-nav-color);
+}
+
+.auth-nav {
+  color: var(--navigate-color);
+}
+
 .note-auth__wrapper {
   height: 60vh;
   display: grid;
@@ -19,7 +41,7 @@
 .note-auth__header h2 {
   margin: 8px 0;
   cursor: default;
-  color: #24B655;
+  color: var(--title-color);
 }
 
 .note-auth__body {
@@ -29,6 +51,10 @@
 
 .note-auth__input {
   width: 100%;
+}
+
+.note-auth__input::placeholder {
+  color: var(--placeholder-color);
 }
 
 .notes-auth__button {
@@ -42,11 +68,13 @@
   border-style: solid;
 
   color: white;
-  border-color: #24B655;
-  background-color: #24B655;
+  border-color: var(--button-color);
+  background-color: var(--button-color);
+
+  transition: all 0.3s ease-in-out;
 }
 
 .notes-auth__button:hover {
-  border-color: #46ce73;
-  background-color: #46ce73;
+  border-color: var(--button-hover-color);
+  background-color: var(--button-hover-color);
 }

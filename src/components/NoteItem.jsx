@@ -5,9 +5,7 @@ import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 
 // Icons
-import iconDelete from '../public/delete.svg';
-import iconArchive from '../public/bookmark.svg';
-import iconRestore from '../public/back-arrow.svg';
+import { MdArchive, MdDelete, MdUnarchive } from 'react-icons/md';
 
 // Routes
 import { notesRoute } from '../consts/routes';
@@ -31,14 +29,20 @@ function NoteItem({ id, title, date, body, archived, onDelete, onToggleArchive }
       </div>
       <div className="note-item__action">
         <button className="note-item__delete-button" onClick={() => onDelete(id)}>
-          <img src={iconDelete} width="22px" />
+          <MdDelete size={22} />
         </button>
-        <button className="note-item__archive-button" onClick={() => onToggleArchive(id)}>
-          {archived
-            ? <img src={iconRestore} width="22px" />
-            : <img src={iconArchive} width="22px" />
-          }
-        </button>
+        {archived
+          ? (
+            <button className="note-item__unarchive-button" onClick={() => onToggleArchive(id)}>
+              <MdUnarchive size={22} />
+            </button>
+          )
+          : (
+            <button className="note-item__archive-button" onClick={() => onToggleArchive(id)}>
+              <MdArchive size={22} />
+            </button>
+          )
+        }
       </div>
     </div>
   );

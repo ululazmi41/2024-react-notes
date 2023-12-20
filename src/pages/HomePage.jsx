@@ -19,8 +19,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 // Toast
 import toast from 'react-hot-toast';
-import { AuthConsumer } from '../contexts/authContext';
-import { DarkmodeConsumer } from '../contexts/themecontext';
 
 function Home({ notes, showing, onDelete, homeNavigateTo, setNotes }) {
   const navigate = useNavigate();
@@ -161,25 +159,13 @@ function Home({ notes, showing, onDelete, homeNavigateTo, setNotes }) {
 
   return (
     <>
-      <DarkmodeConsumer>
-        {({ isDarkmode, toggleDarkmode }) => {
-          return (
-            <AuthConsumer>
-              {({ toggleAuthStatus }) => {
-                return (
-                  <Header isLoggedIn={true} toggleAuthStatus={toggleAuthStatus} isDarkmode={isDarkmode} toggleDarkmode={toggleDarkmode} />
-                );
-              }}
-            </AuthConsumer>
-          );
-        }}
-      </DarkmodeConsumer>
-      <main className='note-app__body'>
+      <Header />
+      <main className="note-app__body">
         <button className="notes-app__body__button-add" onClick={() => navigate("notes/new")}>Tambah</button>
-        <div className='note-app__body__actions'>
+        <div className="note-app__body__actions">
           <div className="note-app__body__buttons">
-            <button id="notes" onClick={() => showPage('notes')} className="">Catatan</button>
-            <button id="archives" onClick={() => showPage('archives')} className="">Arsip</button>
+            <button id="notes" onClick={() => showPage("notes")} className="">Catatan</button>
+            <button id="archives" onClick={() => showPage("archives")} className="">Arsip</button>
           </div>
           <Search value={search} onChange={(event) => handleSearch(event.target.value)} />
         </div>
