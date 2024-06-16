@@ -12,19 +12,21 @@ import toast, { Toaster } from 'react-hot-toast';
 // Route
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { homeRoute, loginRoute, notesRoute, registerRoute } from './consts/routes';
-import PageNotFound from './pages/PageNotFound';
 
 // Pages
 import HomePage from './pages/HomePage';
 import NotePage from './pages/NotePage';
 import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/Registerpage';
+import PageNotFound from './pages/PageNotFound';
+import RegisterPage from './pages/RegisterPage';
 
 // Contexts
 import { AuthProvider } from './contexts/authContext';
+import { LoadingProvider } from './contexts/loadingContext';
 import { DarkmodeProvider } from './contexts/themecontext';
 import { LanguageProvider } from './contexts/languageContext';
-import { LoadingProvider } from './contexts/loadingContext';
+
+// Utils
 import { getAccessToken, getUserLogged } from './utils/network-data';
 
 function GotoLogin() {
