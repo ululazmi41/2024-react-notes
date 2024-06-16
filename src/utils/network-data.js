@@ -30,11 +30,10 @@ async function login({ email, password }) {
   const responseJson = await response.json();
 
   if (responseJson.status !== 'success') {
-    alert(responseJson.message);
-    return { error: true, errorMessage: responseJson.message, data: null };
+    return { error: true, errorMessage: responseJson.message, accessToken: "" };
   }
 
-  return { error: false, errorMessage: responseJson.message, data: responseJson.data };
+  return { error: false, errorMessage: responseJson.message, accessToken: responseJson.data.accessToken };
 }
 
 async function register({ name, email, password }) {

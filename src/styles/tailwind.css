@@ -14,6 +14,10 @@
   display: flex;
 }
 
+.ml-1em {
+  margin-left: 1em;
+}
+
 .h-full {
   height: 100%;
 }

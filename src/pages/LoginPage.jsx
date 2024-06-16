@@ -61,20 +61,21 @@ function LoginPage({ isLoading, toggleAuthStatus, setAuthUser }) {
     }
 
     setLoading(true);
-    const { error, errorMessage, data: { accessToken } } = await login({ email: email, password: password });
+    const { error, errorMessage, accessToken } = await login({ email: email, password: password });
     setLoading(false);
 
     if (error) {
       if (errorMessage.toLowerCase().includes('email')) {
         setEmailInvalid(true);
         setPasswordInvalid(true);
-        return;
       }
   
       if (errorMessage.toLowerCase().includes('password')) {
         setPasswordInvalid(true);
-        return;
       }
+
+      alert(errorMessage);
+      return;
     }
 
     putAccessToken(accessToken);

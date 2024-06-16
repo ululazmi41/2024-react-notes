@@ -43,11 +43,11 @@ function Header() {
           <h1>Catatanku</h1>
         </div>
         <div className="note-app__header__brand-wrapper">
-          {isLoggedIn && (
-            <button className="note-app__logout-button" onClick={handeLogout}><MdLogout className="mt-2px" /> {logout}</button>
-          )}
           <button className="theme-toggler" onClick={toggleDarkmode}>{isDarkmode ? <MdDarkMode /> : <MdOutlineLightMode />} {isDarkmode ? darktheme : lighttheme}</button>
           <button className="theme-toggler" onClick={toggleLanguage}><MdLanguage /> {language}</button>
+          {isLoggedIn && (
+            <button className="note-app__logout-button ml-1em" onClick={handeLogout}><MdLogout className="mt-2px" /> {logout}</button>
+          )}
         </div>
       </div>
     </header>
