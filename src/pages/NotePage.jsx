@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 // layout
-import Header from '../layout/header';
+import Header from '../layout/Header';
 
 // Components
 import Loading from '../components/Loading';

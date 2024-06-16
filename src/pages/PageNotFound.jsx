@@ -1,5 +1,7 @@
 import React, { useContext } from 'react';
-import Header from '../layout/header';
+
+import Header from '../layout/Header';
+
 import { Link } from 'react-router-dom';
 import { homeRoute } from '../consts/routes';
 

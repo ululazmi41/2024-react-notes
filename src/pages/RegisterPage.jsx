@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
 
 // Layout
-import Header from '../layout/header';
+import Header from '../layout/Header';
 
 // Hooks
 import useInput from '../hooks/input';

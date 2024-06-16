@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 // Third-party
 import PropTypes from 'prop-types';
 
-import Header from '../layout/header';
+import Header from '../layout/Header';
 
 // Components
 import Search from '../components/Search';

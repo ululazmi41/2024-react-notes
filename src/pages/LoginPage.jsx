@@ -1,7 +1,8 @@
 import React, { useContext, useState } from 'react';
 
 // Icons
-import Header from '../layout/header';
+import Header from '../layout/Header';
+
 import { Link, useNavigate } from 'react-router-dom';
 import { homeRoute, registerRoute } from '../consts/routes';
 import useInput from '../hooks/input';
