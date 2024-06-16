@@ -2,20 +2,6 @@
 
 The repository is created as a learning assessment project on Dicoding's **React Fundamentals** course, a web application designed to help users create, manage, and organize their personal notes. The application is built using React, React Router, Fetch, Hooks, and Local storage.
 
-## Screenshots
-
-**Login Page**
-
-(screenshot)
-
-**Home Page**
-
-(screenshot)
-
-**Detail Page**
-
-(screenshot)
-
 ## Features
 
 - 404 page
@@ -29,7 +15,7 @@ The repository is created as a learning assessment project on Dicoding's **React
 - Secure routing, unauthorized user redirected to the login page
 - Persistent user state ensuring logged-in user remains authenticated
 
-## Dependencies
+## DependenciesTech
 
 | Name               | Version   |
 |--------------------|:---------:|
